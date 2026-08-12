@@ -14,15 +14,15 @@ export function descendre(charge, formeStation) {
   return { charge: restants, descendus: charge.length - restants.length };
 }
 
-// Montée : embarque depuis la file les voyageurs dont la ligne dessert la
-// forme, dans la limite de la capacité de la rame. Rend la nouvelle charge
-// et la file restée à quai.
+// Montée : embarque depuis la file les voyageurs (`{ f, age }`) dont la ligne
+// dessert la forme, dans la limite de la capacité de la rame. Rend la nouvelle
+// charge (formes embarquées) et la file restée à quai.
 export function monter(charge, attente, formes) {
   const nouvelleCharge = charge.slice();
   const reste = [];
-  attente.forEach((f) => {
-    if (nouvelleCharge.length < CAPACITE_RAME && formes[f]) nouvelleCharge.push(f);
-    else reste.push(f);
+  attente.forEach((t) => {
+    if (nouvelleCharge.length < CAPACITE_RAME && formes[t.f]) nouvelleCharge.push(t.f);
+    else reste.push(t);
   });
   return { charge: nouvelleCharge, attente: reste };
 }

@@ -40,6 +40,7 @@ Pour une règle aléatoire, passer une **graine fixe** : `createRng(n)` (`src/ru
 | `tests/network.test.js` | tracé de ligne (ajout/retrait/limite), limite de lignes |
 | `tests/overload.test.js` | croissance/décroissance de surcharge, saturation |
 | `tests/spawn.test.js` | heures de pointe, probabilité d'apparition, gate triangle |
+| `tests/patience.test.js` | vieillissement de la file, voyageur perdu |
 | `tests/week.test.js` | fin de journée, station bonus, gate triangle, placement |
 
 ## Où mettre un nouveau test

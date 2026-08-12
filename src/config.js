@@ -39,6 +39,9 @@ export const PROBA_EVITE_MEME_FORME = 0.8;  // re-tirage si la forme = celle de 
 export const CAPACITE_FILE = 14;            // file d'attente d'une station
 export const CAPACITE_RAME = 6;             // voyageurs embarqués
 
+// Patience des voyageurs
+export const PATIENCE_MAX = 500;            // ticks avant qu'un voyageur qui attend s'en aille (perdu)
+
 // Rames
 export const VITESSE_RAME = 0.035;          // stations par tick
 export const SEUIL_ARRET = 0.036;           // proximité d'un arrêt

@@ -11,15 +11,15 @@ test("un voyageur descend à une station de sa forme", () => {
 test("une ligne n'embarque que les formes qu'elle dessert", () => {
   const stations = [{ forme: "rond" }, { forme: "carre" }];
   const formes = formesDesservies(stations, [0, 1]);
-  const { charge, attente } = monter([], ["triangle", "rond"], formes);
+  const { charge, attente } = monter([], [{ f: "triangle", age: 0 }, { f: "rond", age: 0 }], formes);
   assert.deepEqual(charge, ["rond"]);
-  assert.deepEqual(attente, ["triangle"]);
+  assert.deepEqual(attente, [{ f: "triangle", age: 0 }]);
 });
 
 test("une rame n'embarque pas au-delà de sa capacité", () => {
   const formes = { rond: 1 };
   const pleine = ["rond", "rond", "rond", "rond", "rond", "rond"];
-  const { charge, attente } = monter(pleine, ["rond"], formes);
+  const { charge, attente } = monter(pleine, [{ f: "rond", age: 0 }], formes);
   assert.equal(charge.length, 6);
-  assert.deepEqual(attente, ["rond"]);
+  assert.deepEqual(attente, [{ f: "rond", age: 0 }]);
 });

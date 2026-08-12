@@ -3,6 +3,7 @@ import { avancerRame, indexArret } from "../rules/trains.js";
 import { formesDesservies, descendre, monter } from "../rules/boarding.js";
 import { prochaineSurcharge, estSaturee } from "../rules/overload.js";
 import { estHeurePointe, probaApparition, formeVoyageur } from "../rules/spawn.js";
+import { vieillirFile } from "../rules/patience.js";
 import { finDeJournee } from "../rules/week.js";
 import { finDeSemaine } from "../state/game.js";
 
@@ -19,7 +20,7 @@ export function tick(G, rng) {
   if (rng() < probaApparition(G.semaine, pointe) && G.stations.length) {
     const s = G.stations[Math.floor(rng() * G.stations.length)];
     const cible = formeVoyageur(rng, G.semaine, s.forme);
-    if (s.attente.length < CAPACITE_FILE) s.attente.push(cible);
+    if (s.attente.length < CAPACITE_FILE) s.attente.push({ f: cible, age: 0 });
   }
 
   /* rames */
@@ -43,8 +44,10 @@ export function tick(G, rng) {
     }
   });
 
-  /* surcharge */
+  /* patience puis surcharge */
   G.stations.forEach(function (s) {
+    const v = vieillirFile(s.attente);
+    s.attente = v.attente; G.perdus += v.perdus;
     s.surcharge = prochaineSurcharge(s.surcharge, s.attente.length);
     if (estSaturee(s.surcharge)) { G.fini = true; G.message = "Station saturée : le réseau s'arrête."; }
   });

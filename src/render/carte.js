@@ -13,7 +13,8 @@ function formeSVG(s, i) {
   else if (s.forme === "carre") g += '<rect x="' + (s.x - r).toFixed(0) + '" y="' + (s.y - r).toFixed(0) + '" width="' + (r * 2) + '" height="' + (r * 2) + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + CONTOUR_STATION + '"/>';
   else g += '<polygon points="' + s.x.toFixed(0) + "," + (s.y - r - 2).toFixed(0) + " " + (s.x + r + 1).toFixed(0) + "," + (s.y + r - 3).toFixed(0) + " " + (s.x - r - 1).toFixed(0) + "," + (s.y + r - 3).toFixed(0) + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + CONTOUR_STATION + '"/>';
   /* voyageurs en attente */
-  s.attente.slice(0, MAX_VOYAGEURS_QUAI).forEach(function (f, k) {
+  s.attente.slice(0, MAX_VOYAGEURS_QUAI).forEach(function (t, k) {
+    var f = t.f;
     var px = s.x - 14 + (k % 4) * 9, py = s.y + (k < 4 ? 18 : 27);
     if (f === "rond") g += '<circle cx="' + px.toFixed(0) + '" cy="' + py.toFixed(0) + '" r="3" fill="#1d1c19"/>';
     else if (f === "carre") g += '<rect x="' + (px - 2.6).toFixed(0) + '" y="' + (py - 2.6).toFixed(0) + '" width="5.2" height="5.2" fill="#1d1c19"/>';
