@@ -31,6 +31,7 @@ export const POINTE_MATIN_DEBUT = 7 * 60;
 export const POINTE_MATIN_FIN = 10 * 60;
 export const POINTE_SOIR_DEBUT = 16 * 60;
 export const POINTE_SOIR_FIN = 19 * 60;
+export const PROBA_EVITE_MEME_FORME = 0.8;  // re-tirage si la forme = celle de la station de départ
 
 // Capacités
 export const CAPACITE_FILE = 14;            // file d'attente d'une station

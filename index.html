@@ -120,8 +120,6 @@ import {
   COUL, NOMS_L, FORMES,
   STATIONS_INITIALES, RONDS_INITIAUX,
   MARGE_X, MARGE_Y, DISTANCE_MIN_STATIONS, ESSAIS_PLACEMENT_MAX,
-  PROBA_APPARITION_BASE, PROBA_APPARITION_PAR_SEMAINE, FACTEUR_HEURE_POINTE,
-  POINTE_MATIN_DEBUT, POINTE_MATIN_FIN, POINTE_SOIR_DEBUT, POINTE_SOIR_FIN,
   CAPACITE_FILE,
   PROBA_TRIANGLE, MAX_LIGNES,
   RAYON_STATION, CONTOUR_STATION, RAYON_SURCHARGE, CONTOUR_SURCHARGE, MAX_VOYAGEURS_QUAI
@@ -131,6 +129,7 @@ import { avancerRame, indexArret } from "./src/rules/trains.js";
 import { formesDesservies, descendre, monter } from "./src/rules/boarding.js";
 import { tracer, peutAjouterLigne } from "./src/rules/network.js";
 import { prochaineSurcharge, estSaturee } from "./src/rules/overload.js";
+import { estHeurePointe, probaApparition, formeVoyageur } from "./src/rules/spawn.js";
 
 var $=function(s){return document.querySelector(s);};
 var rng=createRng(Date.now());
@@ -174,12 +173,10 @@ function tick(){
   if(G.horloge>=MINUTES_PAR_JOUR){ G.horloge-=MINUTES_PAR_JOUR; finDeSemaine(); }
 
   /* apparition de voyageurs */
-  var intensite=PROBA_APPARITION_BASE+G.semaine*PROBA_APPARITION_PAR_SEMAINE;
-  var pointe=(G.horloge>POINTE_MATIN_DEBUT&&G.horloge<POINTE_MATIN_FIN)||(G.horloge>POINTE_SOIR_DEBUT&&G.horloge<POINTE_SOIR_FIN);
-  if(rng()<intensite*(pointe?FACTEUR_HEURE_POINTE:1)&&G.stations.length){
+  var pointe=estHeurePointe(G.horloge);
+  if(rng()<probaApparition(G.semaine,pointe)&&G.stations.length){
     var s=G.stations[ri(0,G.stations.length-1)];
-    var cible;
-    do{ cible=FORMES[ri(0,Math.min(2,G.semaine>2?2:1))]; }while(cible===s.forme&&rng()<.8);
+    var cible=formeVoyageur(rng,G.semaine,s.forme);
     if(s.attente.length<CAPACITE_FILE) s.attente.push(cible);
   }
 
