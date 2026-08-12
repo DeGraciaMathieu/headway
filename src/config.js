@@ -35,19 +35,19 @@ export const POINTE_SOIR_DEBUT = 16 * 60;
 export const POINTE_SOIR_FIN = 19 * 60;
 
 // Capacités
-export const CAPACITE_FILE = 14;            // file d'attente d'une station
+export const CAPACITE_FILE = 5;             // occupation max d'une station (attente + bloqués)
 export const CAPACITE_RAME = 6;             // voyageurs embarqués
 
 // Patience des voyageurs
 export const PATIENCE_MAX = 220;            // ticks avant qu'un voyageur qui attend s'en aille (perdu)
-export const MAX_BLOQUE = 7;                // emplacements bloqués max par station (< SEUIL_SURCHARGE)
+export const MAX_BLOQUE = 4;                // emplacements bloqués max par station (< SEUIL_SURCHARGE)
 
 // Rames
 export const VITESSE_RAME = 0.035;          // stations par tick
 export const SEUIL_ARRET = 0.036;           // proximité d'un arrêt
 
-// Surcharge
-export const SEUIL_SURCHARGE = 8;           // taille de file où la surcharge commence
+// Surcharge (le chrono de fin de partie d'une station)
+export const SEUIL_SURCHARGE = 5;           // occupation où le chrono de surcharge démarre
 export const TAUX_SURCHARGE_CROISSANCE = 0.0032;
 export const TAUX_SURCHARGE_DECROISSANCE = 0.010;
 
