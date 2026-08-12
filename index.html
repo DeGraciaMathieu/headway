@@ -122,12 +122,13 @@ import {
   MARGE_X, MARGE_Y, DISTANCE_MIN_STATIONS, ESSAIS_PLACEMENT_MAX,
   PROBA_APPARITION_BASE, PROBA_APPARITION_PAR_SEMAINE, FACTEUR_HEURE_POINTE,
   POINTE_MATIN_DEBUT, POINTE_MATIN_FIN, POINTE_SOIR_DEBUT, POINTE_SOIR_FIN,
-  CAPACITE_FILE, CAPACITE_RAME, VITESSE_RAME, SEUIL_ARRET,
+  CAPACITE_FILE, CAPACITE_RAME,
   SEUIL_SURCHARGE, TAUX_SURCHARGE_CROISSANCE, TAUX_SURCHARGE_DECROISSANCE,
   PROBA_TRIANGLE, MAX_ARRETS_LIGNE, MAX_LIGNES,
   RAYON_STATION, CONTOUR_STATION, RAYON_SURCHARGE, CONTOUR_SURCHARGE, MAX_VOYAGEURS_QUAI
 } from "./src/config.js";
 import { createRng } from "./src/rules/rng.js";
+import { avancerRame, indexArret } from "./src/rules/trains.js";
 
 var $=function(s){return document.querySelector(s);};
 var rng=createRng(Date.now());
@@ -184,11 +185,10 @@ function tick(){
   G.rames.forEach(function(r){
     var l=G.lignes[r.ligne];
     if(!l||l.stations.length<2)return;
-    r.pos+=r.dir*VITESSE_RAME;
-    if(r.pos>=l.stations.length-1){ r.pos=l.stations.length-1; r.dir=-1; }
-    if(r.pos<=0){ r.pos=0; r.dir=1; }
-    var i=Math.round(r.pos);
-    if(Math.abs(r.pos-i)<SEUIL_ARRET){
+    var mv=avancerRame(r.pos,r.dir,l.stations.length);
+    r.pos=mv.pos; r.dir=mv.dir;
+    var i=indexArret(r.pos);
+    if(i>=0){
       var st=G.stations[l.stations[i]];
       if(st&&r._last!==l.stations[i]+"@"+G.t){
         r._last=l.stations[i]+"@"+G.t;
