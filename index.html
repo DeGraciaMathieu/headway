@@ -114,13 +114,21 @@ svg{display:block;width:100%;height:auto;touch-action:manipulation}
   </div>
 </div>
 
-<script>
-"use strict";
+<script type="module">
+import {
+  CARTE_W, CARTE_H, TICK_MS, MINUTES_PAR_TICK, MINUTES_PAR_JOUR, HORLOGE_DEPART,
+  COUL, NOMS_L, FORMES,
+  STATIONS_INITIALES, RONDS_INITIAUX,
+  MARGE_X, MARGE_Y, DISTANCE_MIN_STATIONS, ESSAIS_PLACEMENT_MAX,
+  PROBA_APPARITION_BASE, PROBA_APPARITION_PAR_SEMAINE, FACTEUR_HEURE_POINTE,
+  POINTE_MATIN_DEBUT, POINTE_MATIN_FIN, POINTE_SOIR_DEBUT, POINTE_SOIR_FIN,
+  CAPACITE_FILE, CAPACITE_RAME, VITESSE_RAME, SEUIL_ARRET,
+  SEUIL_SURCHARGE, TAUX_SURCHARGE_CROISSANCE, TAUX_SURCHARGE_DECROISSANCE,
+  PROBA_TRIANGLE, MAX_ARRETS_LIGNE, MAX_LIGNES,
+  RAYON_STATION, CONTOUR_STATION, RAYON_SURCHARGE, CONTOUR_SURCHARGE, MAX_VOYAGEURS_QUAI
+} from "./src/config.js";
+
 var $=function(s){return document.querySelector(s);};
-var COUL=["#e0483c","#2f6fd0","#f0b429","#3f9e6a"];
-var NOMS_L=["Rouge","Bleue","Jaune","Verte"];
-var FORMES=["rond","carre","triangle"];
-var W=380,H=300;
 
 function rnd(a,b){return a+Math.random()*(b-a);}
 function ri(a,b){return Math.floor(rnd(a,b+1));}
@@ -129,11 +137,11 @@ var G=null;
 
 function nouvellePartie(){
   G={
-    t:0, semaine:1, horloge:6*60, voyageurs:0, perdus:0,
+    t:0, semaine:1, horloge:HORLOGE_DEPART, voyageurs:0, perdus:0,
     stations:[], lignes:[], rames:[], stockRames:1, stockLignes:0,
     selLigne:0, pause:false, fini:false, dotation:false, message:""
   };
-  for(var i=0;i<5;i++) ajouterStation(i<3?"rond":"carre");
+  for(var i=0;i<STATIONS_INITIALES;i++) ajouterStation(i<RONDS_INITIAUX?"rond":"carre");
   G.lignes=[{id:0,stations:[]},{id:1,stations:[]}];
   G.rames=[{ligne:0,pos:0,dir:1,charge:[]},{ligne:1,pos:0,dir:1,charge:[]}];
   G.message="Touche une ligne, puis des stations, pour la tracer.";
@@ -143,13 +151,13 @@ function nouvellePartie(){
 function ajouterStation(forme){
   var essais=0, x, y, ok;
   do{
-    x=rnd(40,W-40); y=rnd(36,H-36); ok=true;
+    x=rnd(MARGE_X,CARTE_W-MARGE_X); y=rnd(MARGE_Y,CARTE_H-MARGE_Y); ok=true;
     for(var i=0;i<G.stations.length;i++){
       var d=Math.hypot(G.stations[i].x-x,G.stations[i].y-y);
-      if(d<58){ok=false;break;}
+      if(d<DISTANCE_MIN_STATIONS){ok=false;break;}
     }
     essais++;
-  }while(!ok&&essais<200);
+  }while(!ok&&essais<ESSAIS_PLACEMENT_MAX);
   G.stations.push({x:x,y:y,forme:forme||FORMES[ri(0,1)],attente:[],surcharge:0});
 }
 
@@ -157,28 +165,28 @@ function ajouterStation(forme){
 function tick(){
   if(G.pause||G.fini)return;
   G.t++;
-  G.horloge+=2;
-  if(G.horloge>=24*60){ G.horloge-=24*60; finDeSemaine(); }
+  G.horloge+=MINUTES_PAR_TICK;
+  if(G.horloge>=MINUTES_PAR_JOUR){ G.horloge-=MINUTES_PAR_JOUR; finDeSemaine(); }
 
   /* apparition de voyageurs */
-  var intensite=.020+G.semaine*.006;
-  var pointe=(G.horloge>7*60&&G.horloge<10*60)||(G.horloge>16*60&&G.horloge<19*60);
-  if(Math.random()<intensite*(pointe?1.8:1)&&G.stations.length){
+  var intensite=PROBA_APPARITION_BASE+G.semaine*PROBA_APPARITION_PAR_SEMAINE;
+  var pointe=(G.horloge>POINTE_MATIN_DEBUT&&G.horloge<POINTE_MATIN_FIN)||(G.horloge>POINTE_SOIR_DEBUT&&G.horloge<POINTE_SOIR_FIN);
+  if(Math.random()<intensite*(pointe?FACTEUR_HEURE_POINTE:1)&&G.stations.length){
     var s=G.stations[ri(0,G.stations.length-1)];
     var cible;
     do{ cible=FORMES[ri(0,Math.min(2,G.semaine>2?2:1))]; }while(cible===s.forme&&Math.random()<.8);
-    if(s.attente.length<14) s.attente.push(cible);
+    if(s.attente.length<CAPACITE_FILE) s.attente.push(cible);
   }
 
   /* rames */
   G.rames.forEach(function(r){
     var l=G.lignes[r.ligne];
     if(!l||l.stations.length<2)return;
-    r.pos+=r.dir*.035;
+    r.pos+=r.dir*VITESSE_RAME;
     if(r.pos>=l.stations.length-1){ r.pos=l.stations.length-1; r.dir=-1; }
     if(r.pos<=0){ r.pos=0; r.dir=1; }
     var i=Math.round(r.pos);
-    if(Math.abs(r.pos-i)<.036){
+    if(Math.abs(r.pos-i)<SEUIL_ARRET){
       var st=G.stations[l.stations[i]];
       if(st&&r._last!==l.stations[i]+"@"+G.t){
         r._last=l.stations[i]+"@"+G.t;
@@ -192,7 +200,7 @@ function tick(){
         l.stations.forEach(function(id){ formesLigne[G.stations[id].forme]=1; });
         var reste=[];
         st.attente.forEach(function(f){
-          if(r.charge.length<6&&formesLigne[f]) r.charge.push(f);
+          if(r.charge.length<CAPACITE_RAME&&formesLigne[f]) r.charge.push(f);
           else reste.push(f);
         });
         st.attente=reste;
@@ -202,8 +210,8 @@ function tick(){
 
   /* surcharge */
   G.stations.forEach(function(s){
-    if(s.attente.length>=8) s.surcharge=Math.min(1,s.surcharge+.0032*(s.attente.length-7));
-    else s.surcharge=Math.max(0,s.surcharge-.010);
+    if(s.attente.length>=SEUIL_SURCHARGE) s.surcharge=Math.min(1,s.surcharge+TAUX_SURCHARGE_CROISSANCE*(s.attente.length-(SEUIL_SURCHARGE-1)));
+    else s.surcharge=Math.max(0,s.surcharge-TAUX_SURCHARGE_DECROISSANCE);
     if(s.surcharge>=1){ G.fini=true; G.message="Station saturée : le réseau s'arrête."; }
   });
 
@@ -213,7 +221,7 @@ function tick(){
 function finDeSemaine(){
   G.semaine++;
   G.dotation=true; G.pause=true;
-  ajouterStation(G.semaine>2&&Math.random()<.35?"triangle":null);
+  ajouterStation(G.semaine>2&&Math.random()<PROBA_TRIANGLE?"triangle":null);
   if(G.semaine%2===0) ajouterStation(null);
   G.message="Fin de semaine "+(G.semaine-1)+" — choisis une dotation.";
 }
@@ -223,7 +231,7 @@ function prendreDotation(type){
     G.stockRames++;
     G.rames.push({ligne:G.selLigne,pos:0,dir:1,charge:[]});
   }else{
-    if(G.lignes.length<4) G.lignes.push({id:G.lignes.length,stations:[]});
+    if(G.lignes.length<MAX_LIGNES) G.lignes.push({id:G.lignes.length,stations:[]});
     G.stockLignes++;
   }
   G.dotation=false; G.pause=false;
@@ -238,37 +246,37 @@ function toucheStation(i){
   var pos=l.stations.indexOf(i);
   if(pos>=0&&pos===l.stations.length-1){ l.stations.pop(); }
   else if(pos>=0){ return; }
-  else if(l.stations.length<8) l.stations.push(i);
+  else if(l.stations.length<MAX_ARRETS_LIGNE) l.stations.push(i);
   rend();
 }
 
 /* ---------- rendu ---------- */
 function formeSVG(s,i){
   var sel=false;
-  var r=11;
+  var r=RAYON_STATION;
   var fill="#fbf9f3", stroke="#1d1c19";
   var g='<g class="st" data-i="'+i+'" style="cursor:pointer">';
-  if(s.forme==="rond") g+='<circle cx="'+s.x.toFixed(0)+'" cy="'+s.y.toFixed(0)+'" r="'+r+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3.5"/>';
-  else if(s.forme==="carre") g+='<rect x="'+(s.x-r).toFixed(0)+'" y="'+(s.y-r).toFixed(0)+'" width="'+(r*2)+'" height="'+(r*2)+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3.5"/>';
-  else g+='<polygon points="'+s.x.toFixed(0)+","+(s.y-r-2).toFixed(0)+" "+(s.x+r+1).toFixed(0)+","+(s.y+r-3).toFixed(0)+" "+(s.x-r-1).toFixed(0)+","+(s.y+r-3).toFixed(0)+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3.5"/>';
+  if(s.forme==="rond") g+='<circle cx="'+s.x.toFixed(0)+'" cy="'+s.y.toFixed(0)+'" r="'+r+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+CONTOUR_STATION+'"/>';
+  else if(s.forme==="carre") g+='<rect x="'+(s.x-r).toFixed(0)+'" y="'+(s.y-r).toFixed(0)+'" width="'+(r*2)+'" height="'+(r*2)+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+CONTOUR_STATION+'"/>';
+  else g+='<polygon points="'+s.x.toFixed(0)+","+(s.y-r-2).toFixed(0)+" "+(s.x+r+1).toFixed(0)+","+(s.y+r-3).toFixed(0)+" "+(s.x-r-1).toFixed(0)+","+(s.y+r-3).toFixed(0)+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+CONTOUR_STATION+'"/>';
   /* voyageurs en attente */
-  s.attente.slice(0,8).forEach(function(f,k){
+  s.attente.slice(0,MAX_VOYAGEURS_QUAI).forEach(function(f,k){
     var px=s.x-14+(k%4)*9, py=s.y+(k<4?18:27);
     if(f==="rond") g+='<circle cx="'+px.toFixed(0)+'" cy="'+py.toFixed(0)+'" r="3" fill="#1d1c19"/>';
     else if(f==="carre") g+='<rect x="'+(px-2.6).toFixed(0)+'" y="'+(py-2.6).toFixed(0)+'" width="5.2" height="5.2" fill="#1d1c19"/>';
     else g+='<polygon points="'+px.toFixed(0)+","+(py-3.4).toFixed(0)+" "+(px+3).toFixed(0)+","+(py+2.4).toFixed(0)+" "+(px-3).toFixed(0)+","+(py+2.4).toFixed(0)+'" fill="#1d1c19"/>';
   });
   if(s.surcharge>0){
-    var c=2*Math.PI*18;
-    g+='<circle cx="'+s.x.toFixed(0)+'" cy="'+s.y.toFixed(0)+'" r="18" fill="none" stroke="#e0483c" stroke-width="3" '
+    var c=2*Math.PI*RAYON_SURCHARGE;
+    g+='<circle cx="'+s.x.toFixed(0)+'" cy="'+s.y.toFixed(0)+'" r="'+RAYON_SURCHARGE+'" fill="none" stroke="#e0483c" stroke-width="'+CONTOUR_SURCHARGE+'" '
       +'stroke-dasharray="'+(c*s.surcharge).toFixed(1)+" "+c.toFixed(1)+'" transform="rotate(-90 '+s.x.toFixed(0)+" "+s.y.toFixed(0)+')"/>';
   }
   return g+"</g>";
 }
 
 function carteSVG(){
-  var s='<svg viewBox="0 0 '+W+" "+H+'" xmlns="http://www.w3.org/2000/svg">';
-  s+='<rect width="'+W+'" height="'+H+'" fill="#fbf9f3"/>';
+  var s='<svg viewBox="0 0 '+CARTE_W+" "+CARTE_H+'" xmlns="http://www.w3.org/2000/svg">';
+  s+='<rect width="'+CARTE_W+'" height="'+CARTE_H+'" fill="#fbf9f3"/>';
   s+='<path d="M0 214 C90 204 150 228 220 218 C290 208 340 224 380 216" fill="none" stroke="#dfe8f2" stroke-width="16"/>';
 
   G.lignes.forEach(function(l){
@@ -329,7 +337,7 @@ function rend(){
     el.onclick=function(){ G.selLigne=l.id; rend(); };
     ll.appendChild(el);
   });
-  if(G.lignes.length<4){
+  if(G.lignes.length<MAX_LIGNES){
     var el2=document.createElement("div");
     el2.className="ligne libre";
     el2.innerHTML='<span class="pastille" style="background:var(--trait)"></span>'
@@ -340,7 +348,7 @@ function rend(){
   var st=$("#stock");
   if(G.dotation){
     st.innerHTML='<span class="item on" data-d="rame"><b>+1</b> rame sur la ligne '+NOMS_L[G.selLigne].toLowerCase()+"</span>"
-      +'<span class="item on" data-d="ligne"><b>+1</b> ligne'+(G.lignes.length>=4?" (max atteint)":"")+"</span>";
+      +'<span class="item on" data-d="ligne"><b>+1</b> ligne'+(G.lignes.length>=MAX_LIGNES?" (max atteint)":"")+"</span>";
     st.querySelectorAll("[data-d]").forEach(function(el){
       el.onclick=function(){ prendreDotation(el.dataset.d); };
     });
@@ -360,7 +368,7 @@ $("#aide").onclick=function(){ G.pause=true; $("#modal").classList.add("on"); re
 $("#fermer").onclick=function(){ $("#modal").classList.remove("on"); if(!G.dotation)G.pause=false; rend(); };
 
 nouvellePartie();
-setInterval(tick,90);
+setInterval(tick,TICK_MS);
 </script>
 </body>
 </html>

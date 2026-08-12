@@ -1,0 +1,10 @@
+{
+  "name": "headway",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "npx serve .",
+    "test": "node --test",
+    "test:watch": "node --test --watch"
+  }
+}
