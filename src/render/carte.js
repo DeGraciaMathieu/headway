@@ -44,7 +44,7 @@ export function carteSVG(G) {
   G.rames.forEach(function (r) {
     var l = G.lignes[r.ligne];
     if (!l || l.stations.length < STATIONS_MIN_LIGNE) return;
-    var i = Math.floor(r.pos), f = r.pos - i;
+    var i = Math.min(Math.floor(r.pos), l.stations.length - 1), f = r.pos - i;
     var a = G.stations[l.stations[i]], b = G.stations[l.stations[Math.min(i + 1, l.stations.length - 1)]];
     var x = a.x + (b.x - a.x) * f, y = a.y + (b.y - a.y) * f;
     var ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
@@ -61,7 +61,7 @@ export function carteSVG(G) {
   var sel = G.lignes[G.selLigne];
   if (!G.fini && sel && sel.stations.length) {
     var dep = G.stations[sel.stations[sel.stations.length - 1]];
-    s += '<circle cx="' + dep.x.toFixed(0) + '" cy="' + dep.y.toFixed(0) + '" r="' + RAYON_DEPART + '" fill="none" stroke="' + COUL[G.selLigne] + '" stroke-width="' + CONTOUR_DEPART + '" stroke-dasharray="3 3"/>';
+    s += '<circle cx="' + dep.x.toFixed(0) + '" cy="' + dep.y.toFixed(0) + '" r="' + RAYON_DEPART + '" fill="none" stroke="' + COUL[G.selLigne] + '" stroke-width="' + CONTOUR_DEPART + '" stroke-dasharray="3 3" pointer-events="none"/>';
   }
 
   return s + "</svg>";

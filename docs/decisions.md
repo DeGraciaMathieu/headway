@@ -89,10 +89,13 @@ la couche règles. Aucune randomness purement cosmétique n'a été identifiée.
 Behaviour that looks wrong but was preserved, because the refactor must not change the
 game. Each entry: what it is, where, and why it was not fixed.
 
-- **Clic souris avalé par le re-rendu** : `render/hud.js` réécrit `#carte` (innerHTML) à
-  chaque tick (~90 ms) et rebranche les `onclick` par station. Un clic souris dont le
-  `mousedown`/`mouseup` chevauche un re-rendu ne déclenche pas de `click` (le nœud `.st` est
-  remplacé). Comportement d'origine identique — non corrigé pour ne pas changer le jeu.
+- **Clic souris avalé par le re-rendu** : à l'origine, `render/hud.js` réécrivait `#carte`
+  (innerHTML) à chaque tick (~90 ms) et rebranchait les `onclick` par station ; un clic dont
+  le `mousedown`/`mouseup` chevauchait un re-rendu ne déclenchait pas de `click` (le nœud
+  `.st` était remplacé). Laissé tel quel pendant le refactor (comportement d'origine).
+  **Depuis corrigé** (hors périmètre du refactor, sur demande) par délégation d'événements
+  sur les conteneurs persistants `#carte` / `#listelignes` / `#stock`, qui ne sont jamais
+  remplacés — le `click` remonte jusqu'à eux même si l'enfant a été recréé.
 - **`G.perdus`** déclaré (`state/game.js`, ex-l.133) mais jamais incrémenté. Conservé tel quel.
 - **`G.stockRames` / `G.stockLignes`** incrémentés dans `prendreDotation` mais jamais lus
   ailleurs. Conservés.

@@ -19,9 +19,10 @@ export function rend(G, actions) {
     + '<div class="c"><b>' + G.lignes.filter(function (l) { return l.stations.length >= STATIONS_MIN_LIGNE; }).length + "</b><span>lignes actives</span></div>";
 
   $("#carte").innerHTML = carteSVG(G);
-  $("#carte").querySelectorAll(".st").forEach(function (el) {
-    el.onclick = function () { actions.toucheStation(+el.dataset.i); };
-  });
+  $("#carte").onclick = function (e) {
+    var g = e.target.closest(".st");
+    if (g) actions.toucheStation(+g.dataset.i);
+  };
 
   $("#consigne").innerHTML = G.fini
     ? "<b>" + G.message + "</b> " + G.voyageurs + " voyageurs transportés en " + G.semaine + " semaines."
@@ -32,11 +33,11 @@ export function rend(G, actions) {
   G.lignes.forEach(function (l) {
     var el = document.createElement("div");
     el.className = "ligne" + (G.selLigne === l.id ? " sel" : "");
+    el.dataset.l = l.id;
     var nb = G.rames.filter(function (r) { return r.ligne === l.id; }).length;
     el.innerHTML = '<span class="pastille" style="background:' + COUL[l.id] + '"></span>'
       + '<span class="n">' + NOMS_L[l.id] + "</span>"
       + '<span class="st">' + l.stations.length + " stations · " + nb + " rame" + (nb > 1 ? "s" : "") + "</span>";
-    el.onclick = function () { actions.choisirLigne(l.id); };
     ll.appendChild(el);
   });
   if (G.lignes.length < MAX_LIGNES) {
@@ -46,17 +47,22 @@ export function rend(G, actions) {
       + '<span class="n">Ligne supplémentaire — dotation de fin de semaine</span>';
     ll.appendChild(el2);
   }
+  ll.onclick = function (e) {
+    var el = e.target.closest(".ligne");
+    if (el && el.dataset.l !== undefined) actions.choisirLigne(+el.dataset.l);
+  };
 
   var st = $("#stock");
   if (G.dotation) {
     st.innerHTML = '<span class="item on" data-d="rame"><b>+1</b> rame sur la ligne ' + NOMS_L[G.selLigne].toLowerCase() + "</span>"
       + '<span class="item on" data-d="ligne"><b>+1</b> ligne' + (G.lignes.length >= MAX_LIGNES ? " (max atteint)" : "") + "</span>";
-    st.querySelectorAll("[data-d]").forEach(function (el) {
-      el.onclick = function () { actions.prendreDotation(el.dataset.d); };
-    });
   } else {
     st.innerHTML = '<span class="item vide">Prochaine dotation à minuit</span>';
   }
+  st.onclick = function (e) {
+    var el = e.target.closest("[data-d]");
+    if (el) actions.prendreDotation(el.dataset.d);
+  };
 
   $("#pause").textContent = G.fini ? "Réseau arrêté" : (G.pause ? "Reprendre" : "Pause");
   $("#pause").disabled = G.fini;
