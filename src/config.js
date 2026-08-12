@@ -12,6 +12,8 @@ export const HORLOGE_DEPART = 6 * 60;       // 06:00
 export const COUL = ["#e0483c", "#2f6fd0", "#f0b429", "#3f9e6a"];
 export const NOMS_L = ["Rouge", "Bleue", "Jaune", "Verte"];
 export const FORMES = ["rond", "carre", "triangle"];
+export const INDEX_FORMES_MAX = 2;          // dernier index de FORMES (le triangle)
+export const STATIONS_MIN_LIGNE = 2;        // arrêts minimum pour qu'une ligne soit active
 
 // Mise en place initiale
 export const STATIONS_INITIALES = 5;
@@ -48,6 +50,7 @@ export const TAUX_SURCHARGE_DECROISSANCE = 0.010;
 
 // Croissance du réseau
 export const PROBA_TRIANGLE = 0.35;
+export const SEMAINE_TRIANGLE_MIN = 3;      // semaine à partir de laquelle le triangle apparaît
 export const MAX_ARRETS_LIGNE = 8;
 export const MAX_LIGNES = 4;
 

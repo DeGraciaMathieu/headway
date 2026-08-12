@@ -1,6 +1,7 @@
 import {
   CARTE_W, CARTE_H, COUL,
   RAYON_STATION, CONTOUR_STATION, RAYON_SURCHARGE, CONTOUR_SURCHARGE, MAX_VOYAGEURS_QUAI,
+  STATIONS_MIN_LIGNE,
 } from "../config.js";
 
 // SVG d'une station : sa forme, ses voyageurs en attente et son anneau de surcharge.
@@ -33,7 +34,7 @@ export function carteSVG(G) {
   s += '<path d="M0 214 C90 204 150 228 220 218 C290 208 340 224 380 216" fill="none" stroke="#dfe8f2" stroke-width="16"/>';
 
   G.lignes.forEach(function (l) {
-    if (l.stations.length < 2) return;
+    if (l.stations.length < STATIONS_MIN_LIGNE) return;
     var pts = l.stations.map(function (i) { return G.stations[i].x.toFixed(0) + "," + G.stations[i].y.toFixed(0); }).join(" ");
     s += '<polyline points="' + pts + '" fill="none" stroke="' + COUL[l.id] + '" stroke-width="'
       + (G.selLigne === l.id ? 8 : 6.5) + '" stroke-linecap="round" stroke-linejoin="round" opacity="'
@@ -42,7 +43,7 @@ export function carteSVG(G) {
 
   G.rames.forEach(function (r) {
     var l = G.lignes[r.ligne];
-    if (!l || l.stations.length < 2) return;
+    if (!l || l.stations.length < STATIONS_MIN_LIGNE) return;
     var i = Math.floor(r.pos), f = r.pos - i;
     var a = G.stations[l.stations[i]], b = G.stations[l.stations[Math.min(i + 1, l.stations.length - 1)]];
     var x = a.x + (b.x - a.x) * f, y = a.y + (b.y - a.y) * f;

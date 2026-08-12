@@ -1,4 +1,4 @@
-import { MINUTES_PAR_TICK, MINUTES_PAR_JOUR, CAPACITE_FILE } from "../config.js";
+import { MINUTES_PAR_TICK, MINUTES_PAR_JOUR, CAPACITE_FILE, STATIONS_MIN_LIGNE } from "../config.js";
 import { avancerRame, indexArret } from "../rules/trains.js";
 import { formesDesservies, descendre, monter } from "../rules/boarding.js";
 import { prochaineSurcharge, estSaturee } from "../rules/overload.js";
@@ -25,7 +25,7 @@ export function tick(G, rng) {
   /* rames */
   G.rames.forEach(function (r) {
     const l = G.lignes[r.ligne];
-    if (!l || l.stations.length < 2) return;
+    if (!l || l.stations.length < STATIONS_MIN_LIGNE) return;
     const mv = avancerRame(r.pos, r.dir, l.stations.length);
     r.pos = mv.pos; r.dir = mv.dir;
     const i = indexArret(r.pos);

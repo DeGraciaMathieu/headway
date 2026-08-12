@@ -8,6 +8,8 @@ import {
   POINTE_SOIR_FIN,
   PROBA_EVITE_MEME_FORME,
   FORMES,
+  INDEX_FORMES_MAX,
+  SEMAINE_TRIANGLE_MIN,
 } from "../config.js";
 
 // Heure de pointe : plage du matin ou plage du soir.
@@ -27,7 +29,7 @@ export function probaApparition(semaine, pointe) {
 // partir de la semaine 3, et on évite le plus souvent la forme de la station
 // de départ.
 export function formeVoyageur(rng, semaine, formeStation) {
-  const maxIndex = Math.min(2, semaine > 2 ? 2 : 1);
+  const maxIndex = semaine >= SEMAINE_TRIANGLE_MIN ? INDEX_FORMES_MAX : INDEX_FORMES_MAX - 1;
   let cible;
   do {
     cible = FORMES[Math.floor(rng() * (maxIndex + 1))];

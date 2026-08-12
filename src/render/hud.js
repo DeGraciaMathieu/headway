@@ -1,4 +1,4 @@
-import { NOMS_L, COUL, MAX_LIGNES } from "../config.js";
+import { NOMS_L, COUL, MAX_LIGNES, STATIONS_MIN_LIGNE } from "../config.js";
 import { carteSVG } from "./carte.js";
 
 var $ = function (s) { return document.querySelector(s); };
@@ -16,7 +16,7 @@ export function rend(G, actions) {
      '<div class="c"><b>' + G.voyageurs + "</b><span>transportés</span></div>"
     + '<div class="c"><b>' + enAttente + "</b><span>sur les quais</span></div>"
     + '<div class="c"><b>' + G.rames.length + "</b><span>rames</span></div>"
-    + '<div class="c"><b>' + G.lignes.filter(function (l) { return l.stations.length > 1; }).length + "</b><span>lignes actives</span></div>";
+    + '<div class="c"><b>' + G.lignes.filter(function (l) { return l.stations.length >= STATIONS_MIN_LIGNE; }).length + "</b><span>lignes actives</span></div>";
 
   $("#carte").innerHTML = carteSVG(G);
   $("#carte").querySelectorAll(".st").forEach(function (el) {

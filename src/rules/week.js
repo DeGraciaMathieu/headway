@@ -1,6 +1,7 @@
 import {
   MINUTES_PAR_JOUR,
   PROBA_TRIANGLE,
+  SEMAINE_TRIANGLE_MIN,
   MARGE_X,
   MARGE_Y,
   CARTE_W,
@@ -17,7 +18,7 @@ export function finDeJournee(horloge) {
 // Forme de la station ouverte en fin de semaine : un triangle est possible à
 // partir de la semaine 3, sinon forme par défaut (null).
 export function formeNouvelleStation(rng, semaine) {
-  return semaine > 2 && rng() < PROBA_TRIANGLE ? "triangle" : null;
+  return semaine >= SEMAINE_TRIANGLE_MIN && rng() < PROBA_TRIANGLE ? "triangle" : null;
 }
 
 // Une station supplémentaire ouvre une semaine sur deux.
