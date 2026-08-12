@@ -1,20 +1,7 @@
-import { NOMS_L, COUL, FORMES, MAX_LIGNES, STATIONS_MIN_LIGNE } from "../config.js";
-import { formesDesservies } from "../rules/boarding.js";
+import { NOMS_L, COUL, MAX_LIGNES, STATIONS_MIN_LIGNE } from "../config.js";
 import { carteSVG } from "./carte.js";
 
 var $ = function (s) { return document.querySelector(s); };
-
-// Petits glyphes des formes desservies par une ligne, dans l'ordre de FORMES.
-function glyphesDesservies(formes) {
-  return FORMES.filter(function (f) { return formes[f]; }).map(function (f) {
-    var forme = f === "rond"
-      ? '<circle cx="5" cy="5" r="4" fill="#1d1c19"/>'
-      : f === "carre"
-        ? '<rect x="1" y="1" width="8" height="8" fill="#1d1c19"/>'
-        : '<polygon points="5,1 9,9 1,9" fill="#1d1c19"/>';
-    return '<svg width="10" height="10" viewBox="0 0 10 10" style="margin-left:3px;vertical-align:middle">' + forme + "</svg>";
-  }).join("");
-}
 
 // Redessine toute l'interface à partir de l'état. Les éléments cliquables
 // générés ici (stations, lignes, dotations) sont reliés aux intentions
@@ -53,8 +40,7 @@ export function rend(G, actions, vue) {
     var nb = G.rames.filter(function (r) { return r.ligne === l.id; }).length;
     el.innerHTML = '<span class="pastille" style="background:' + COUL[l.id] + '"></span>'
       + '<span class="n">' + NOMS_L[l.id] + "</span>"
-      + '<span class="st">' + l.stations.length + " stations · " + nb + " rame" + (nb > 1 ? "s" : "")
-        + glyphesDesservies(formesDesservies(G.stations, l.stations)) + "</span>";
+      + '<span class="st">' + l.stations.length + " stations · " + nb + " rame" + (nb > 1 ? "s" : "") + "</span>";
     ll.appendChild(el);
   });
   if (G.lignes.length < MAX_LIGNES) {
