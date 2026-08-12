@@ -16,7 +16,8 @@ La flèche ne pointe que vers le bas. Une règle qui importe un rendu est l'erre
 | `src/config.js` | Toutes les valeurs de réglage nommées | rien |
 | `src/rules/rng.js` | RNG à graine (LCG), injecté | rien |
 | `src/rules/trains.js` | Déplacement d'une rame + demi-tour, alignement à quai | `config` |
-| `src/rules/boarding.js` | Descente/montée par forme, formes desservies, capacité | `config` |
+| `src/rules/routing.js` | Distances de routage (BFS) d'une station vers une forme | `config` |
+| `src/rules/boarding.js` | Échange à un arrêt : arrivées, correspondances, montées, capacité | `config` |
 | `src/rules/network.js` | Tracé d'une ligne, limites d'arrêts et de lignes | `config` |
 | `src/rules/overload.js` | Surcharge (croissance/décroissance), saturation | `config` |
 | `src/rules/spawn.js` | Apparition des voyageurs, heure de pointe, tirage de forme | `config` |

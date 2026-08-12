@@ -36,7 +36,8 @@ Pour une règle aléatoire, passer une **graine fixe** : `createRng(n)` (`src/ru
 | Fichier de test | Couvre |
 |---|---|
 | `tests/trains.test.js` | déplacement, demi-tour au terminus, alignement à quai |
-| `tests/boarding.test.js` | descente par forme, montée selon formes desservies, capacité |
+| `tests/routing.test.js` | distances de routage, correspondances, formes inatteignables |
+| `tests/boarding.test.js` | arrivées, montées utiles, correspondances, capacité, trajet bout-à-bout |
 | `tests/network.test.js` | tracé de ligne (ajout/retrait/limite), limite de lignes |
 | `tests/overload.test.js` | croissance/décroissance de surcharge, saturation |
 | `tests/spawn.test.js` | heures de pointe, probabilité d'apparition, gate triangle |

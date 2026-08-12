@@ -1,28 +1,40 @@
 import { CAPACITE_RAME } from "../config.js";
 
-// Formes desservies par une ligne : l'ensemble des formes de ses stations.
-export function formesDesservies(stations, indices) {
-  const set = {};
-  indices.forEach((id) => { set[stations[id].forme] = 1; });
-  return set;
-}
+// Traite l'arrêt d'une rame en station selon le routage.
+// `distParForme` : forme -> tableau de distances par index de station
+// (voir rules/routing.js). `charge` : formes à bord. `attente` : file de la
+// station (`{ f, age }`). `ligneStations` : indices des arrêts de la ligne.
+// `iStation` : index global de la station de l'arrêt.
+//
+// Descentes d'abord, puis montées :
+// - un voyageur à bord dont la station est de sa forme (distance 0) est arrivé ;
+// - sinon, si la station est le meilleur point de sortie de cette ligne vers sa
+//   forme (distance minimale de la ligne), il descend pour prendre une
+//   correspondance et rejoint la file ;
+// - un voyageur en attente monte si cette ligne le rapproche de sa forme.
+//
+// Rend la nouvelle charge, la nouvelle file et le nombre d'arrivées.
+export function traiterArret(charge, attente, ligneStations, iStation, distParForme) {
+  const minSurLigne = (f) => Math.min.apply(null, ligneStations.map((i) => distParForme[f][i]));
 
-// Descente : les voyageurs à bord dont la forme est celle de la station
-// descendent. Rend la charge restante et le nombre de descendus.
-export function descendre(charge, formeStation) {
-  const restants = charge.filter((f) => f !== formeStation);
-  return { charge: restants, descendus: charge.length - restants.length };
-}
+  let transportes = 0;
+  const nouvelleCharge = [];
+  const correspondances = [];
+  charge.forEach((f) => {
+    const d = distParForme[f][iStation];
+    if (d === 0) transportes++;
+    else if (Number.isFinite(d) && d === minSurLigne(f)) correspondances.push(f);
+    else nouvelleCharge.push(f);
+  });
 
-// Montée : embarque depuis la file les voyageurs (`{ f, age }`) dont la ligne
-// dessert la forme, dans la limite de la capacité de la rame. Rend la nouvelle
-// charge (formes embarquées) et la file restée à quai.
-export function monter(charge, attente, formes) {
-  const nouvelleCharge = charge.slice();
+  const file = attente.concat(correspondances.map((f) => ({ f, age: 0 })));
   const reste = [];
-  attente.forEach((t) => {
-    if (nouvelleCharge.length < CAPACITE_RAME && formes[t.f]) nouvelleCharge.push(t.f);
+  file.forEach((t) => {
+    const d = distParForme[t.f][iStation];
+    const rapproche = d > 0 && minSurLigne(t.f) < d;
+    if (rapproche && nouvelleCharge.length < CAPACITE_RAME) nouvelleCharge.push(t.f);
     else reste.push(t);
   });
-  return { charge: nouvelleCharge, attente: reste };
+
+  return { charge: nouvelleCharge, attente: reste, transportes };
 }

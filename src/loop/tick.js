@@ -1,6 +1,7 @@
-import { MINUTES_PAR_TICK, MINUTES_PAR_JOUR, CAPACITE_FILE, STATIONS_MIN_LIGNE } from "../config.js";
+import { MINUTES_PAR_TICK, MINUTES_PAR_JOUR, CAPACITE_FILE, STATIONS_MIN_LIGNE, FORMES } from "../config.js";
 import { avancerRame, indexArret } from "../rules/trains.js";
-import { formesDesservies, descendre, monter } from "../rules/boarding.js";
+import { traiterArret } from "../rules/boarding.js";
+import { distancesVersForme } from "../rules/routing.js";
 import { prochaineSurcharge, estSaturee } from "../rules/overload.js";
 import { estHeurePointe, probaApparition, formeVoyageur } from "../rules/spawn.js";
 import { vieillirFile } from "../rules/patience.js";
@@ -23,7 +24,9 @@ export function tick(G, rng) {
     if (s.attente.length + s.bloque < CAPACITE_FILE) s.attente.push({ f: cible, age: 0 });
   }
 
-  /* rames */
+  /* rames : distances de routage vers chaque forme, réseau fixe sur ce tick */
+  const distParForme = {};
+  FORMES.forEach(function (f) { distParForme[f] = distancesVersForme(G.stations, G.lignes, f); });
   G.rames.forEach(function (r) {
     const l = G.lignes[r.ligne];
     if (!l || l.stations.length < STATIONS_MIN_LIGNE) return;
@@ -31,15 +34,12 @@ export function tick(G, rng) {
     r.pos = mv.pos; r.dir = mv.dir;
     const i = indexArret(r.pos);
     if (i >= 0) {
-      const st = G.stations[l.stations[i]];
-      if (st && r._last !== l.stations[i] + "@" + G.t) {
-        r._last = l.stations[i] + "@" + G.t;
-        /* descentes */
-        const d = descendre(r.charge, st.forme);
-        r.charge = d.charge; G.voyageurs += d.descendus;
-        /* montées : seulement si la ligne dessert la forme voulue */
-        const m = monter(r.charge, st.attente, formesDesservies(G.stations, l.stations));
-        r.charge = m.charge; st.attente = m.attente;
+      const iStation = l.stations[i];
+      const st = G.stations[iStation];
+      if (st && r._last !== iStation + "@" + G.t) {
+        r._last = iStation + "@" + G.t;
+        const res = traiterArret(r.charge, st.attente, l.stations, iStation, distParForme);
+        r.charge = res.charge; st.attente = res.attente; G.voyageurs += res.transportes;
       }
     }
   });
