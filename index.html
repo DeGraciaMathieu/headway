@@ -119,9 +119,7 @@ import {
   CARTE_W, CARTE_H, TICK_MS, MINUTES_PAR_TICK, MINUTES_PAR_JOUR, HORLOGE_DEPART,
   COUL, NOMS_L, FORMES,
   STATIONS_INITIALES, RONDS_INITIAUX,
-  MARGE_X, MARGE_Y, DISTANCE_MIN_STATIONS, ESSAIS_PLACEMENT_MAX,
-  CAPACITE_FILE,
-  PROBA_TRIANGLE, MAX_LIGNES,
+  CAPACITE_FILE, MAX_LIGNES,
   RAYON_STATION, CONTOUR_STATION, RAYON_SURCHARGE, CONTOUR_SURCHARGE, MAX_VOYAGEURS_QUAI
 } from "./src/config.js";
 import { createRng } from "./src/rules/rng.js";
@@ -130,6 +128,7 @@ import { formesDesservies, descendre, monter } from "./src/rules/boarding.js";
 import { tracer, peutAjouterLigne } from "./src/rules/network.js";
 import { prochaineSurcharge, estSaturee } from "./src/rules/overload.js";
 import { estHeurePointe, probaApparition, formeVoyageur } from "./src/rules/spawn.js";
+import { finDeJournee, formeNouvelleStation, stationBonus, placerStation } from "./src/rules/week.js";
 
 var $=function(s){return document.querySelector(s);};
 var rng=createRng(Date.now());
@@ -153,16 +152,8 @@ function nouvellePartie(){
 }
 
 function ajouterStation(forme){
-  var essais=0, x, y, ok;
-  do{
-    x=rnd(MARGE_X,CARTE_W-MARGE_X); y=rnd(MARGE_Y,CARTE_H-MARGE_Y); ok=true;
-    for(var i=0;i<G.stations.length;i++){
-      var d=Math.hypot(G.stations[i].x-x,G.stations[i].y-y);
-      if(d<DISTANCE_MIN_STATIONS){ok=false;break;}
-    }
-    essais++;
-  }while(!ok&&essais<ESSAIS_PLACEMENT_MAX);
-  G.stations.push({x:x,y:y,forme:forme||FORMES[ri(0,1)],attente:[],surcharge:0});
+  var p=placerStation(rng,G.stations);
+  G.stations.push({x:p.x,y:p.y,forme:forme||FORMES[ri(0,1)],attente:[],surcharge:0});
 }
 
 /* ---------- simulation ---------- */
@@ -170,7 +161,7 @@ function tick(){
   if(G.pause||G.fini)return;
   G.t++;
   G.horloge+=MINUTES_PAR_TICK;
-  if(G.horloge>=MINUTES_PAR_JOUR){ G.horloge-=MINUTES_PAR_JOUR; finDeSemaine(); }
+  if(finDeJournee(G.horloge)){ G.horloge-=MINUTES_PAR_JOUR; finDeSemaine(); }
 
   /* apparition de voyageurs */
   var pointe=estHeurePointe(G.horloge);
@@ -213,8 +204,8 @@ function tick(){
 function finDeSemaine(){
   G.semaine++;
   G.dotation=true; G.pause=true;
-  ajouterStation(G.semaine>2&&rng()<PROBA_TRIANGLE?"triangle":null);
-  if(G.semaine%2===0) ajouterStation(null);
+  ajouterStation(formeNouvelleStation(rng,G.semaine));
+  if(stationBonus(G.semaine)) ajouterStation(null);
   G.message="Fin de semaine "+(G.semaine-1)+" — choisis une dotation.";
 }
 
