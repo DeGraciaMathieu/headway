@@ -124,12 +124,13 @@ import {
   POINTE_MATIN_DEBUT, POINTE_MATIN_FIN, POINTE_SOIR_DEBUT, POINTE_SOIR_FIN,
   CAPACITE_FILE,
   SEUIL_SURCHARGE, TAUX_SURCHARGE_CROISSANCE, TAUX_SURCHARGE_DECROISSANCE,
-  PROBA_TRIANGLE, MAX_ARRETS_LIGNE, MAX_LIGNES,
+  PROBA_TRIANGLE, MAX_LIGNES,
   RAYON_STATION, CONTOUR_STATION, RAYON_SURCHARGE, CONTOUR_SURCHARGE, MAX_VOYAGEURS_QUAI
 } from "./src/config.js";
 import { createRng } from "./src/rules/rng.js";
 import { avancerRame, indexArret } from "./src/rules/trains.js";
 import { formesDesservies, descendre, monter } from "./src/rules/boarding.js";
+import { tracer, peutAjouterLigne } from "./src/rules/network.js";
 
 var $=function(s){return document.querySelector(s);};
 var rng=createRng(Date.now());
@@ -226,7 +227,7 @@ function prendreDotation(type){
     G.stockRames++;
     G.rames.push({ligne:G.selLigne,pos:0,dir:1,charge:[]});
   }else{
-    if(G.lignes.length<MAX_LIGNES) G.lignes.push({id:G.lignes.length,stations:[]});
+    if(peutAjouterLigne(G.lignes.length)) G.lignes.push({id:G.lignes.length,stations:[]});
     G.stockLignes++;
   }
   G.dotation=false; G.pause=false;
@@ -238,10 +239,7 @@ function prendreDotation(type){
 function toucheStation(i){
   if(G.fini)return;
   var l=G.lignes[G.selLigne];
-  var pos=l.stations.indexOf(i);
-  if(pos>=0&&pos===l.stations.length-1){ l.stations.pop(); }
-  else if(pos>=0){ return; }
-  else if(l.stations.length<MAX_ARRETS_LIGNE) l.stations.push(i);
+  l.stations=tracer(l.stations,i);
   rend();
 }
 
