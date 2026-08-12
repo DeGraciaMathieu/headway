@@ -6,7 +6,6 @@ import {
   POINTE_MATIN_FIN,
   POINTE_SOIR_DEBUT,
   POINTE_SOIR_FIN,
-  PROBA_EVITE_MEME_FORME,
   FORMES,
   INDEX_FORMES_MAX,
   SEMAINE_TRIANGLE_MIN,
@@ -26,13 +25,13 @@ export function probaApparition(semaine, pointe) {
 }
 
 // Forme de destination d'un nouveau voyageur. Le triangle n'est possible qu'à
-// partir de la semaine 3, et on évite le plus souvent la forme de la station
-// de départ.
+// partir de la semaine 3. La cible est toujours différente de la forme de la
+// station de départ (un voyageur ne vise jamais la station où il est).
 export function formeVoyageur(rng, semaine, formeStation) {
   const maxIndex = semaine >= SEMAINE_TRIANGLE_MIN ? INDEX_FORMES_MAX : INDEX_FORMES_MAX - 1;
   let cible;
   do {
     cible = FORMES[Math.floor(rng() * (maxIndex + 1))];
-  } while (cible === formeStation && rng() < PROBA_EVITE_MEME_FORME);
+  } while (cible === formeStation);
   return cible;
 }

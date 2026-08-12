@@ -23,7 +23,7 @@ Voyageurs perdus : `G.perdus`.
 |---|---|---|---|
 | Heure de pointe ? | `estHeurePointe(horloge)` | `src/rules/spawn.js` | `POINTE_MATIN_*`, `POINTE_SOIR_*` |
 | Probabilité d'apparition | `probaApparition(semaine, pointe)` | `src/rules/spawn.js` | `PROBA_APPARITION_BASE`, `PROBA_APPARITION_PAR_SEMAINE`, `FACTEUR_HEURE_POINTE` |
-| Forme du voyageur | `formeVoyageur(rng, semaine, formeStation)` | `src/rules/spawn.js` | `SEMAINE_TRIANGLE_MIN`, `INDEX_FORMES_MAX`, `PROBA_EVITE_MEME_FORME` |
+| Forme du voyageur (≠ station de départ) | `formeVoyageur(rng, semaine, formeStation)` | `src/rules/spawn.js` | `SEMAINE_TRIANGLE_MIN`, `INDEX_FORMES_MAX` |
 | Plafond de la file | `s.attente.length + s.bloque < CAPACITE_FILE` | `src/loop/tick.js` | `CAPACITE_FILE` |
 | Vieillissement / perte / blocage | `vieillirFile(attente, bloque)` → `{attente, perdus, bloque}` | `src/rules/patience.js` | `PATIENCE_MAX`, `MAX_BLOQUE` |
 | Prochaine surcharge (sur l'occupation) | `prochaineSurcharge(surcharge, attente + bloque)` | `src/rules/overload.js` | `SEUIL_SURCHARGE`, `TAUX_SURCHARGE_CROISSANCE`, `TAUX_SURCHARGE_DECROISSANCE` |

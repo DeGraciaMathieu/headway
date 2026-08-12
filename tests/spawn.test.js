@@ -27,3 +27,10 @@ test("le triangle peut apparaître à partir de la semaine 3", () => {
   }
   assert.equal(vuTriangle, true);
 });
+
+test("un voyageur ne cible jamais la forme de sa station de départ", () => {
+  const rng = createRng(2);
+  for (let n = 0; n < 500; n++) {
+    assert.notEqual(formeVoyageur(rng, 3, "carre"), "carre");
+  }
+});
