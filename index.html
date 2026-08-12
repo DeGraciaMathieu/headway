@@ -122,13 +122,14 @@ import {
   MARGE_X, MARGE_Y, DISTANCE_MIN_STATIONS, ESSAIS_PLACEMENT_MAX,
   PROBA_APPARITION_BASE, PROBA_APPARITION_PAR_SEMAINE, FACTEUR_HEURE_POINTE,
   POINTE_MATIN_DEBUT, POINTE_MATIN_FIN, POINTE_SOIR_DEBUT, POINTE_SOIR_FIN,
-  CAPACITE_FILE, CAPACITE_RAME,
+  CAPACITE_FILE,
   SEUIL_SURCHARGE, TAUX_SURCHARGE_CROISSANCE, TAUX_SURCHARGE_DECROISSANCE,
   PROBA_TRIANGLE, MAX_ARRETS_LIGNE, MAX_LIGNES,
   RAYON_STATION, CONTOUR_STATION, RAYON_SURCHARGE, CONTOUR_SURCHARGE, MAX_VOYAGEURS_QUAI
 } from "./src/config.js";
 import { createRng } from "./src/rules/rng.js";
 import { avancerRame, indexArret } from "./src/rules/trains.js";
+import { formesDesservies, descendre, monter } from "./src/rules/boarding.js";
 
 var $=function(s){return document.querySelector(s);};
 var rng=createRng(Date.now());
@@ -193,19 +194,11 @@ function tick(){
       if(st&&r._last!==l.stations[i]+"@"+G.t){
         r._last=l.stations[i]+"@"+G.t;
         /* descentes */
-        r.charge=r.charge.filter(function(f){
-          if(f===st.forme){ G.voyageurs++; return false; }
-          return true;
-        });
+        var d=descendre(r.charge,st.forme);
+        r.charge=d.charge; G.voyageurs+=d.descendus;
         /* montées : seulement si la ligne dessert la forme voulue */
-        var formesLigne={};
-        l.stations.forEach(function(id){ formesLigne[G.stations[id].forme]=1; });
-        var reste=[];
-        st.attente.forEach(function(f){
-          if(r.charge.length<CAPACITE_RAME&&formesLigne[f]) r.charge.push(f);
-          else reste.push(f);
-        });
-        st.attente=reste;
+        var m=monter(r.charge,st.attente,formesDesservies(G.stations,l.stations));
+        r.charge=m.charge; st.attente=m.attente;
       }
     }
   });
