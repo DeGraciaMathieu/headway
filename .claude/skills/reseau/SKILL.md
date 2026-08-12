@@ -6,9 +6,9 @@ auto_invoke: true
 
 # Réseau — tracé des lignes et dotations
 
-Le joueur sélectionne une ligne puis touche des stations pour l'enchaîner. Retoucher le
-terminus le retire ; toucher une station intermédiaire ne fait rien. En fin de semaine, il
-encaisse une dotation : une rame de plus (sur la ligne sélectionnée) ou une ligne de plus.
+Le joueur sélectionne une ligne puis touche des stations pour l'enchaîner. Retoucher une
+station déjà sur la ligne la retire du tracé (désélection). En fin de semaine, il encaisse
+une dotation : une rame de plus (sur la ligne sélectionnée) ou une ligne de plus.
 
 Donnée d'une ligne (`src/state/game.js`) : `{ id, stations[] }` où `stations` est un tableau
 d'indices dans `G.stations`. Couleurs `COUL`, noms `NOMS_L` (`src/config.js`).

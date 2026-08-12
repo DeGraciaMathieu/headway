@@ -10,8 +10,8 @@ test("retoucher le terminus le retire", () => {
   assert.deepEqual(tracer([0, 1, 2], 2), [0, 1]);
 });
 
-test("toucher une station intermédiaire ne change rien", () => {
-  assert.deepEqual(tracer([0, 1, 2], 1), [0, 1, 2]);
+test("retoucher une station intermédiaire la retire du tracé", () => {
+  assert.deepEqual(tracer([0, 1, 2], 1), [0, 2]);
 });
 
 test("le tracé est plafonné au nombre maximum d'arrêts", () => {
