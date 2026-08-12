@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Réseau</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --papier:#f4f0e6; --trait:#d9d2c2; --encre:#1d1c19; --terne:#8b8577;
+  --rouge:#e0483c; --bleu:#2f6fd0; --jaune:#f0b429; --vert:#3f9e6a;
+  --sans:"Space Grotesk",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#e6e0d2;font-family:var(--sans);color:var(--encre);
+  display:flex;justify-content:center;min-height:100vh;-webkit-tap-highlight-color:transparent}
+.phone{width:100%;max-width:412px;background:var(--papier);min-height:100vh;position:relative;
+  display:flex;flex-direction:column}
+
+.hud{padding:14px 16px 10px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.ville{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--terne)}
+h1{font-size:23px;font-weight:700;margin:4px 0 0;letter-spacing:-.02em}
+.horloge{text-align:right;flex:none}
+.horloge b{display:block;font-size:24px;font-weight:700;line-height:1;letter-spacing:-.02em}
+.horloge span{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--terne)}
+.aide{border:1px solid var(--trait);background:transparent;color:var(--terne);
+  width:28px;height:28px;flex:none;cursor:pointer;font-family:var(--sans)}
+
+.compteurs{display:flex;gap:6px;padding:0 16px 10px}
+.c{flex:1;border:1px solid var(--trait);padding:6px 6px;text-align:center;background:#fff}
+.c b{display:block;font-size:16px;font-weight:700;line-height:1.15}
+.c span{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--terne)}
+
+.carte{background:#fbf9f3;border-top:1px solid var(--trait);border-bottom:1px solid var(--trait)}
+svg{display:block;width:100%;height:auto;touch-action:manipulation}
+
+.consigne{padding:10px 16px 0;font-size:12.5px;line-height:1.45;color:#4a4740;min-height:20px}
+.consigne b{font-weight:700}
+
+.lignes{padding:12px 16px 0}
+.ltitre{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--terne);margin-bottom:8px;
+  display:flex;justify-content:space-between}
+.ligne{display:flex;align-items:center;gap:9px;padding:8px 6px;border-bottom:1px solid var(--trait);cursor:pointer}
+.ligne.sel{background:#fff;border-left:3px solid var(--encre);padding-left:8px}
+.pastille{width:14px;height:14px;border-radius:50%;flex:none}
+.ligne .n{flex:1;font-size:13.5px;font-weight:500}
+.ligne .st{font-size:11.5px;color:var(--terne)}
+.ligne.libre{color:var(--terne);font-size:12.5px}
+
+.stock{display:flex;gap:6px;padding:12px 16px 0;flex-wrap:wrap}
+.item{border:1px solid var(--trait);background:#fff;padding:7px 9px;font-size:11.5px;cursor:pointer}
+.item b{font-weight:700}
+.item.vide{color:var(--terne);cursor:default}
+.item.on{background:var(--encre);color:var(--papier);border-color:var(--encre)}
+
+.foot{margin-top:auto;padding:14px 16px 22px}
+.foot button{width:100%;border:0;background:var(--encre);color:var(--papier);
+  font-family:var(--sans);font-weight:700;font-size:13.5px;letter-spacing:.06em;
+  text-transform:uppercase;padding:14px;cursor:pointer}
+.foot .sec{background:transparent;border:1px solid var(--trait);color:var(--terne);margin-top:8px}
+.note{text-align:center;font-size:11px;color:var(--terne);margin-top:10px;line-height:1.5}
+
+.modal{position:absolute;inset:0;background:rgba(244,240,230,.97);z-index:50;display:none;
+  padding:26px 20px;overflow-y:auto}
+.modal.on{display:block}
+.modal h2{font-size:20px;margin:0 0 12px;letter-spacing:-.02em}
+.modal h3{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rouge);margin:16px 0 6px}
+.modal p{font-size:13px;line-height:1.55;margin:0 0 10px;color:#4a4740}
+.modal button{width:100%;background:var(--encre);color:var(--papier);border:0;padding:14px;margin-top:12px;
+  font-family:var(--sans);font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="hud">
+    <div><div class="ville" id="ville"></div><h1>Réseau</h1></div>
+    <div style="display:flex;gap:8px;align-items:flex-start">
+      <button class="aide" id="aide">?</button>
+      <div class="horloge"><b id="horloge">06:00</b><span id="periode">semaine 1</span></div>
+    </div>
+  </div>
+
+  <div class="compteurs" id="compteurs"></div>
+
+  <div class="carte"><div id="carte"></div></div>
+
+  <p class="consigne" id="consigne"></p>
+
+  <div class="lignes">
+    <div class="ltitre"><span>Lignes</span><span id="modeline"></span></div>
+    <div id="listelignes"></div>
+  </div>
+
+  <div class="stock" id="stock"></div>
+
+  <div class="foot">
+    <button id="pause">Pause</button>
+    <button class="sec" id="rejouer">Nouvelle partie</button>
+    <p class="note" id="note"></p>
+  </div>
+
+  <div class="modal" id="modal">
+    <h2>Comment ça se joue</h2>
+    <p>Des voyageurs apparaissent dans les stations. Chacun veut rejoindre une station de la <b>forme</b> dessinée sur lui : rond, carré ou triangle.</p>
+    <h3>Tracer</h3>
+    <p>Choisis une ligne dans la liste, puis touche les stations l'une après l'autre : elles s'enchaînent. Retoucher la dernière station la retire. Une rame fait l'aller-retour sur sa ligne.</p>
+    <h3>Tenir</h3>
+    <p>Une station qui accumule trop de monde entre en surcharge. Si l'anneau rouge se referme, le réseau s'arrête. Une station saturée se dégonfle dès qu'une rame passe.</p>
+    <h3>Grandir</h3>
+    <p>Chaque semaine, une dotation : une rame de plus, une ligne de plus. De nouvelles stations ouvrent, et les formes rares apparaissent — un voyageur triangle ne descendra que dans une station triangle.</p>
+    <button id="fermer">Compris</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+var $=function(s){return document.querySelector(s);};
+var COUL=["#e0483c","#2f6fd0","#f0b429","#3f9e6a"];
+var NOMS_L=["Rouge","Bleue","Jaune","Verte"];
+var FORMES=["rond","carre","triangle"];
+var W=380,H=300;
+
+function rnd(a,b){return a+Math.random()*(b-a);}
+function ri(a,b){return Math.floor(rnd(a,b+1));}
+
+var G=null;
+
+function nouvellePartie(){
+  G={
+    t:0, semaine:1, horloge:6*60, voyageurs:0, perdus:0,
+    stations:[], lignes:[], rames:[], stockRames:1, stockLignes:0,
+    selLigne:0, pause:false, fini:false, dotation:false, message:""
+  };
+  for(var i=0;i<5;i++) ajouterStation(i<3?"rond":"carre");
+  G.lignes=[{id:0,stations:[]},{id:1,stations:[]}];
+  G.rames=[{ligne:0,pos:0,dir:1,charge:[]},{ligne:1,pos:0,dir:1,charge:[]}];
+  G.message="Touche une ligne, puis des stations, pour la tracer.";
+  rend();
+}
+
+function ajouterStation(forme){
+  var essais=0, x, y, ok;
+  do{
+    x=rnd(40,W-40); y=rnd(36,H-36); ok=true;
+    for(var i=0;i<G.stations.length;i++){
+      var d=Math.hypot(G.stations[i].x-x,G.stations[i].y-y);
+      if(d<58){ok=false;break;}
+    }
+    essais++;
+  }while(!ok&&essais<200);
+  G.stations.push({x:x,y:y,forme:forme||FORMES[ri(0,1)],attente:[],surcharge:0});
+}
+
+/* ---------- simulation ---------- */
+function tick(){
+  if(G.pause||G.fini)return;
+  G.t++;
+  G.horloge+=2;
+  if(G.horloge>=24*60){ G.horloge-=24*60; finDeSemaine(); }
+
+  /* apparition de voyageurs */
+  var intensite=.020+G.semaine*.006;
+  var pointe=(G.horloge>7*60&&G.horloge<10*60)||(G.horloge>16*60&&G.horloge<19*60);
+  if(Math.random()<intensite*(pointe?1.8:1)&&G.stations.length){
+    var s=G.stations[ri(0,G.stations.length-1)];
+    var cible;
+    do{ cible=FORMES[ri(0,Math.min(2,G.semaine>2?2:1))]; }while(cible===s.forme&&Math.random()<.8);
+    if(s.attente.length<14) s.attente.push(cible);
+  }
+
+  /* rames */
+  G.rames.forEach(function(r){
+    var l=G.lignes[r.ligne];
+    if(!l||l.stations.length<2)return;
+    r.pos+=r.dir*.035;
+    if(r.pos>=l.stations.length-1){ r.pos=l.stations.length-1; r.dir=-1; }
+    if(r.pos<=0){ r.pos=0; r.dir=1; }
+    var i=Math.round(r.pos);
+    if(Math.abs(r.pos-i)<.036){
+      var st=G.stations[l.stations[i]];
+      if(st&&r._last!==l.stations[i]+"@"+G.t){
+        r._last=l.stations[i]+"@"+G.t;
+        /* descentes */
+        r.charge=r.charge.filter(function(f){
+          if(f===st.forme){ G.voyageurs++; return false; }
+          return true;
+        });
+        /* montées : seulement si la ligne dessert la forme voulue */
+        var formesLigne={};
+        l.stations.forEach(function(id){ formesLigne[G.stations[id].forme]=1; });
+        var reste=[];
+        st.attente.forEach(function(f){
+          if(r.charge.length<6&&formesLigne[f]) r.charge.push(f);
+          else reste.push(f);
+        });
+        st.attente=reste;
+      }
+    }
+  });
+
+  /* surcharge */
+  G.stations.forEach(function(s){
+    if(s.attente.length>=8) s.surcharge=Math.min(1,s.surcharge+.0032*(s.attente.length-7));
+    else s.surcharge=Math.max(0,s.surcharge-.010);
+    if(s.surcharge>=1){ G.fini=true; G.message="Station saturée : le réseau s'arrête."; }
+  });
+
+  rend();
+}
+
+function finDeSemaine(){
+  G.semaine++;
+  G.dotation=true; G.pause=true;
+  ajouterStation(G.semaine>2&&Math.random()<.35?"triangle":null);
+  if(G.semaine%2===0) ajouterStation(null);
+  G.message="Fin de semaine "+(G.semaine-1)+" — choisis une dotation.";
+}
+
+function prendreDotation(type){
+  if(type==="rame"){
+    G.stockRames++;
+    G.rames.push({ligne:G.selLigne,pos:0,dir:1,charge:[]});
+  }else{
+    if(G.lignes.length<4) G.lignes.push({id:G.lignes.length,stations:[]});
+    G.stockLignes++;
+  }
+  G.dotation=false; G.pause=false;
+  G.message="";
+  rend();
+}
+
+/* ---------- interaction ---------- */
+function toucheStation(i){
+  if(G.fini)return;
+  var l=G.lignes[G.selLigne];
+  var pos=l.stations.indexOf(i);
+  if(pos>=0&&pos===l.stations.length-1){ l.stations.pop(); }
+  else if(pos>=0){ return; }
+  else if(l.stations.length<8) l.stations.push(i);
+  rend();
+}
+
+/* ---------- rendu ---------- */
+function formeSVG(s,i){
+  var sel=false;
+  var r=11;
+  var fill="#fbf9f3", stroke="#1d1c19";
+  var g='<g class="st" data-i="'+i+'" style="cursor:pointer">';
+  if(s.forme==="rond") g+='<circle cx="'+s.x.toFixed(0)+'" cy="'+s.y.toFixed(0)+'" r="'+r+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3.5"/>';
+  else if(s.forme==="carre") g+='<rect x="'+(s.x-r).toFixed(0)+'" y="'+(s.y-r).toFixed(0)+'" width="'+(r*2)+'" height="'+(r*2)+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3.5"/>';
+  else g+='<polygon points="'+s.x.toFixed(0)+","+(s.y-r-2).toFixed(0)+" "+(s.x+r+1).toFixed(0)+","+(s.y+r-3).toFixed(0)+" "+(s.x-r-1).toFixed(0)+","+(s.y+r-3).toFixed(0)+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3.5"/>';
+  /* voyageurs en attente */
+  s.attente.slice(0,8).forEach(function(f,k){
+    var px=s.x-14+(k%4)*9, py=s.y+(k<4?18:27);
+    if(f==="rond") g+='<circle cx="'+px.toFixed(0)+'" cy="'+py.toFixed(0)+'" r="3" fill="#1d1c19"/>';
+    else if(f==="carre") g+='<rect x="'+(px-2.6).toFixed(0)+'" y="'+(py-2.6).toFixed(0)+'" width="5.2" height="5.2" fill="#1d1c19"/>';
+    else g+='<polygon points="'+px.toFixed(0)+","+(py-3.4).toFixed(0)+" "+(px+3).toFixed(0)+","+(py+2.4).toFixed(0)+" "+(px-3).toFixed(0)+","+(py+2.4).toFixed(0)+'" fill="#1d1c19"/>';
+  });
+  if(s.surcharge>0){
+    var c=2*Math.PI*18;
+    g+='<circle cx="'+s.x.toFixed(0)+'" cy="'+s.y.toFixed(0)+'" r="18" fill="none" stroke="#e0483c" stroke-width="3" '
+      +'stroke-dasharray="'+(c*s.surcharge).toFixed(1)+" "+c.toFixed(1)+'" transform="rotate(-90 '+s.x.toFixed(0)+" "+s.y.toFixed(0)+')"/>';
+  }
+  return g+"</g>";
+}
+
+function carteSVG(){
+  var s='<svg viewBox="0 0 '+W+" "+H+'" xmlns="http://www.w3.org/2000/svg">';
+  s+='<rect width="'+W+'" height="'+H+'" fill="#fbf9f3"/>';
+  s+='<path d="M0 214 C90 204 150 228 220 218 C290 208 340 224 380 216" fill="none" stroke="#dfe8f2" stroke-width="16"/>';
+
+  G.lignes.forEach(function(l){
+    if(l.stations.length<2)return;
+    var pts=l.stations.map(function(i){return G.stations[i].x.toFixed(0)+","+G.stations[i].y.toFixed(0);}).join(" ");
+    s+='<polyline points="'+pts+'" fill="none" stroke="'+COUL[l.id]+'" stroke-width="'
+      +(G.selLigne===l.id?8:6.5)+'" stroke-linecap="round" stroke-linejoin="round" opacity="'
+      +(G.selLigne===l.id?1:.85)+'"/>';
+  });
+
+  G.rames.forEach(function(r){
+    var l=G.lignes[r.ligne];
+    if(!l||l.stations.length<2)return;
+    var i=Math.floor(r.pos), f=r.pos-i;
+    var a=G.stations[l.stations[i]], b=G.stations[l.stations[Math.min(i+1,l.stations.length-1)]];
+    var x=a.x+(b.x-a.x)*f, y=a.y+(b.y-a.y)*f;
+    var ang=Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI;
+    s+='<rect x="'+(x-9).toFixed(0)+'" y="'+(y-6).toFixed(0)+'" width="18" height="12" fill="#1d1c19" '
+      +'transform="rotate('+ang.toFixed(0)+" "+x.toFixed(0)+" "+y.toFixed(0)+')"/>';
+    if(r.charge.length)
+      s+='<text x="'+x.toFixed(0)+'" y="'+(y-11).toFixed(0)+'" font-family="Space Grotesk" font-size="10" fill="#1d1c19" text-anchor="middle">'+r.charge.length+"</text>";
+  });
+
+  G.stations.forEach(function(st,i){ s+=formeSVG(st,i); });
+  return s+"</svg>";
+}
+
+function rend(){
+  var h=Math.floor(G.horloge/60), m=Math.floor(G.horloge%60);
+  $("#horloge").textContent=(h<10?"0":"")+h+":"+(m<10?"0":"")+m;
+  $("#periode").textContent="semaine "+G.semaine;
+  $("#ville").textContent="Réseau nord · "+G.stations.length+" stations";
+  var enAttente=G.stations.reduce(function(a,s){return a+s.attente.length;},0);
+  $("#compteurs").innerHTML=
+     '<div class="c"><b>'+G.voyageurs+"</b><span>transportés</span></div>"
+    +'<div class="c"><b>'+enAttente+"</b><span>sur les quais</span></div>"
+    +'<div class="c"><b>'+G.rames.length+"</b><span>rames</span></div>"
+    +'<div class="c"><b>'+G.lignes.filter(function(l){return l.stations.length>1;}).length+"</b><span>lignes actives</span></div>";
+
+  $("#carte").innerHTML=carteSVG();
+  $("#carte").querySelectorAll(".st").forEach(function(el){
+    el.onclick=function(){ toucheStation(+el.dataset.i); };
+  });
+
+  $("#consigne").innerHTML=G.fini
+    ? "<b>"+G.message+"</b> "+G.voyageurs+" voyageurs transportés en "+G.semaine+" semaines."
+    : (G.message||"Les voyageurs descendent dans une station qui a <b>leur forme</b>. Une ligne qui ne dessert pas cette forme ne les prendra pas.");
+
+  $("#modeline").textContent=G.fini?"terminé":"ligne "+NOMS_L[G.selLigne].toLowerCase()+" en tracé";
+  var ll=$("#listelignes"); ll.innerHTML="";
+  G.lignes.forEach(function(l){
+    var el=document.createElement("div");
+    el.className="ligne"+(G.selLigne===l.id?" sel":"");
+    var nb=G.rames.filter(function(r){return r.ligne===l.id;}).length;
+    el.innerHTML='<span class="pastille" style="background:'+COUL[l.id]+'"></span>'
+      +'<span class="n">'+NOMS_L[l.id]+"</span>"
+      +'<span class="st">'+l.stations.length+" stations · "+nb+" rame"+(nb>1?"s":"")+"</span>";
+    el.onclick=function(){ G.selLigne=l.id; rend(); };
+    ll.appendChild(el);
+  });
+  if(G.lignes.length<4){
+    var el2=document.createElement("div");
+    el2.className="ligne libre";
+    el2.innerHTML='<span class="pastille" style="background:var(--trait)"></span>'
+      +'<span class="n">Ligne supplémentaire — dotation de fin de semaine</span>';
+    ll.appendChild(el2);
+  }
+
+  var st=$("#stock");
+  if(G.dotation){
+    st.innerHTML='<span class="item on" data-d="rame"><b>+1</b> rame sur la ligne '+NOMS_L[G.selLigne].toLowerCase()+"</span>"
+      +'<span class="item on" data-d="ligne"><b>+1</b> ligne'+(G.lignes.length>=4?" (max atteint)":"")+"</span>";
+    st.querySelectorAll("[data-d]").forEach(function(el){
+      el.onclick=function(){ prendreDotation(el.dataset.d); };
+    });
+  }else{
+    st.innerHTML='<span class="item vide">Prochaine dotation à minuit</span>';
+  }
+
+  $("#pause").textContent=G.fini?"Réseau arrêté":(G.pause?"Reprendre":"Pause");
+  $("#pause").disabled=G.fini;
+  $("#note").innerHTML=G.fini?"":"Une station en surcharge se dégonfle dès qu'une rame la dessert.";
+}
+
+/* ---------- boucle ---------- */
+$("#pause").onclick=function(){ if(!G.fini&&!G.dotation){G.pause=!G.pause;rend();} };
+$("#rejouer").onclick=nouvellePartie;
+$("#aide").onclick=function(){ G.pause=true; $("#modal").classList.add("on"); rend(); };
+$("#fermer").onclick=function(){ $("#modal").classList.remove("on"); if(!G.dotation)G.pause=false; rend(); };
+
+nouvellePartie();
+setInterval(tick,90);
+</script>
+</body>
+</html>
