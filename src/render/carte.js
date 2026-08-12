@@ -1,7 +1,7 @@
 import {
   CARTE_W, CARTE_H, COUL,
   RAYON_STATION, CONTOUR_STATION, RAYON_SURCHARGE, CONTOUR_SURCHARGE, MAX_VOYAGEURS_QUAI,
-  STATIONS_MIN_LIGNE,
+  STATIONS_MIN_LIGNE, RAYON_DEPART, CONTOUR_DEPART,
 } from "../config.js";
 
 // SVG d'une station : sa forme, ses voyageurs en attente et son anneau de surcharge.
@@ -55,5 +55,14 @@ export function carteSVG(G) {
   });
 
   G.stations.forEach(function (st, i) { s += formeSVG(st, i); });
+
+  // Repère du bout actif de la ligne en cours de tracé : la station depuis
+  // laquelle le prochain arrêt se relie.
+  var sel = G.lignes[G.selLigne];
+  if (!G.fini && sel && sel.stations.length) {
+    var dep = G.stations[sel.stations[sel.stations.length - 1]];
+    s += '<circle cx="' + dep.x.toFixed(0) + '" cy="' + dep.y.toFixed(0) + '" r="' + RAYON_DEPART + '" fill="none" stroke="' + COUL[G.selLigne] + '" stroke-width="' + CONTOUR_DEPART + '" stroke-dasharray="3 3"/>';
+  }
+
   return s + "</svg>";
 }

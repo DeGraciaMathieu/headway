@@ -59,4 +59,6 @@ export const RAYON_STATION = 11;
 export const CONTOUR_STATION = 3.5;
 export const RAYON_SURCHARGE = 18;
 export const CONTOUR_SURCHARGE = 3;
+export const RAYON_DEPART = 15;             // anneau marquant le bout actif de la ligne tracée
+export const CONTOUR_DEPART = 2.5;
 export const MAX_VOYAGEURS_QUAI = 8;        // voyageurs dessinés sur un quai
