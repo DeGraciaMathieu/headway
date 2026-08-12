@@ -127,10 +127,12 @@ import {
   PROBA_TRIANGLE, MAX_ARRETS_LIGNE, MAX_LIGNES,
   RAYON_STATION, CONTOUR_STATION, RAYON_SURCHARGE, CONTOUR_SURCHARGE, MAX_VOYAGEURS_QUAI
 } from "./src/config.js";
+import { createRng } from "./src/rules/rng.js";
 
 var $=function(s){return document.querySelector(s);};
+var rng=createRng(Date.now());
 
-function rnd(a,b){return a+Math.random()*(b-a);}
+function rnd(a,b){return a+rng()*(b-a);}
 function ri(a,b){return Math.floor(rnd(a,b+1));}
 
 var G=null;
@@ -171,10 +173,10 @@ function tick(){
   /* apparition de voyageurs */
   var intensite=PROBA_APPARITION_BASE+G.semaine*PROBA_APPARITION_PAR_SEMAINE;
   var pointe=(G.horloge>POINTE_MATIN_DEBUT&&G.horloge<POINTE_MATIN_FIN)||(G.horloge>POINTE_SOIR_DEBUT&&G.horloge<POINTE_SOIR_FIN);
-  if(Math.random()<intensite*(pointe?FACTEUR_HEURE_POINTE:1)&&G.stations.length){
+  if(rng()<intensite*(pointe?FACTEUR_HEURE_POINTE:1)&&G.stations.length){
     var s=G.stations[ri(0,G.stations.length-1)];
     var cible;
-    do{ cible=FORMES[ri(0,Math.min(2,G.semaine>2?2:1))]; }while(cible===s.forme&&Math.random()<.8);
+    do{ cible=FORMES[ri(0,Math.min(2,G.semaine>2?2:1))]; }while(cible===s.forme&&rng()<.8);
     if(s.attente.length<CAPACITE_FILE) s.attente.push(cible);
   }
 
@@ -221,7 +223,7 @@ function tick(){
 function finDeSemaine(){
   G.semaine++;
   G.dotation=true; G.pause=true;
-  ajouterStation(G.semaine>2&&Math.random()<PROBA_TRIANGLE?"triangle":null);
+  ajouterStation(G.semaine>2&&rng()<PROBA_TRIANGLE?"triangle":null);
   if(G.semaine%2===0) ajouterStation(null);
   G.message="Fin de semaine "+(G.semaine-1)+" — choisis une dotation.";
 }
