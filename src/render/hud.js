@@ -1,12 +1,26 @@
-import { NOMS_L, COUL, MAX_LIGNES, STATIONS_MIN_LIGNE } from "../config.js";
+import { NOMS_L, COUL, FORMES, MAX_LIGNES, STATIONS_MIN_LIGNE } from "../config.js";
+import { formesDesservies } from "../rules/boarding.js";
 import { carteSVG } from "./carte.js";
 
 var $ = function (s) { return document.querySelector(s); };
 
+// Petits glyphes des formes desservies par une ligne, dans l'ordre de FORMES.
+function glyphesDesservies(formes) {
+  return FORMES.filter(function (f) { return formes[f]; }).map(function (f) {
+    var forme = f === "rond"
+      ? '<circle cx="5" cy="5" r="4" fill="#1d1c19"/>'
+      : f === "carre"
+        ? '<rect x="1" y="1" width="8" height="8" fill="#1d1c19"/>'
+        : '<polygon points="5,1 9,9 1,9" fill="#1d1c19"/>';
+    return '<svg width="10" height="10" viewBox="0 0 10 10" style="margin-left:3px;vertical-align:middle">' + forme + "</svg>";
+  }).join("");
+}
+
 // Redessine toute l'interface à partir de l'état. Les éléments cliquables
 // générés ici (stations, lignes, dotations) sont reliés aux intentions
-// fournies dans `actions`.
-export function rend(G, actions) {
+// fournies dans `actions`. `vue` porte les données hors-partie (meilleur score).
+export function rend(G, actions, vue) {
+  vue = vue || {};
   var h = Math.floor(G.horloge / 60), m = Math.floor(G.horloge % 60);
   $("#horloge").textContent = (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
   $("#periode").textContent = "semaine " + G.semaine;
@@ -15,6 +29,7 @@ export function rend(G, actions) {
   $("#compteurs").innerHTML =
      '<div class="c"><b>' + G.voyageurs + "</b><span>transportés</span></div>"
     + '<div class="c"><b>' + enAttente + "</b><span>sur les quais</span></div>"
+    + '<div class="c"><b>' + G.perdus + "</b><span>perdus</span></div>"
     + '<div class="c"><b>' + G.rames.length + "</b><span>rames</span></div>"
     + '<div class="c"><b>' + G.lignes.filter(function (l) { return l.stations.length >= STATIONS_MIN_LIGNE; }).length + "</b><span>lignes actives</span></div>";
 
@@ -25,7 +40,8 @@ export function rend(G, actions) {
   };
 
   $("#consigne").innerHTML = G.fini
-    ? "<b>" + G.message + "</b> " + G.voyageurs + " voyageurs transportés en " + G.semaine + " semaines."
+    ? "<b>" + G.message + "</b> " + G.voyageurs + " voyageurs transportés, " + G.perdus + " perdus, en " + G.semaine + " semaines. "
+      + (vue.nouveauRecord ? "<b>Nouveau record !</b>" : "Record : " + (vue.meilleur || 0) + ".")
     : (G.message || "Les voyageurs descendent dans une station qui a <b>leur forme</b>. Une ligne qui ne dessert pas cette forme ne les prendra pas.");
 
   $("#modeline").textContent = G.fini ? "terminé" : "ligne " + NOMS_L[G.selLigne].toLowerCase() + " en tracé";
@@ -37,7 +53,8 @@ export function rend(G, actions) {
     var nb = G.rames.filter(function (r) { return r.ligne === l.id; }).length;
     el.innerHTML = '<span class="pastille" style="background:' + COUL[l.id] + '"></span>'
       + '<span class="n">' + NOMS_L[l.id] + "</span>"
-      + '<span class="st">' + l.stations.length + " stations · " + nb + " rame" + (nb > 1 ? "s" : "") + "</span>";
+      + '<span class="st">' + l.stations.length + " stations · " + nb + " rame" + (nb > 1 ? "s" : "")
+        + glyphesDesservies(formesDesservies(G.stations, l.stations)) + "</span>";
     ll.appendChild(el);
   });
   if (G.lignes.length < MAX_LIGNES) {
