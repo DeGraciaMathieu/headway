@@ -20,7 +20,7 @@ export function tick(G, rng) {
   if (rng() < probaApparition(G.semaine, pointe) && G.stations.length) {
     const s = G.stations[Math.floor(rng() * G.stations.length)];
     const cible = formeVoyageur(rng, G.semaine, s.forme);
-    if (s.attente.length < CAPACITE_FILE) s.attente.push({ f: cible, age: 0 });
+    if (s.attente.length + s.bloque < CAPACITE_FILE) s.attente.push({ f: cible, age: 0 });
   }
 
   /* rames */
@@ -44,11 +44,11 @@ export function tick(G, rng) {
     }
   });
 
-  /* patience puis surcharge */
+  /* patience (perte + emplacements bloqués) puis surcharge sur l'occupation */
   G.stations.forEach(function (s) {
-    const v = vieillirFile(s.attente);
-    s.attente = v.attente; G.perdus += v.perdus;
-    s.surcharge = prochaineSurcharge(s.surcharge, s.attente.length);
+    const v = vieillirFile(s.attente, s.bloque);
+    s.attente = v.attente; G.perdus += v.perdus; s.bloque = v.bloque;
+    s.surcharge = prochaineSurcharge(s.surcharge, s.attente.length + s.bloque);
     if (estSaturee(s.surcharge)) { G.fini = true; G.message = "Station saturée : le réseau s'arrête."; }
   });
 

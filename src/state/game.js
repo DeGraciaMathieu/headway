@@ -6,7 +6,7 @@ import { tracer, peutAjouterLigne } from "../rules/network.js";
 // ou, à défaut, un rond ou un carré au hasard.
 export function ajouterStation(G, rng, forme) {
   const p = placerStation(rng, G.stations);
-  G.stations.push({ x: p.x, y: p.y, forme: forme || FORMES[Math.floor(rng() * 2)], attente: [], surcharge: 0 });
+  G.stations.push({ x: p.x, y: p.y, forme: forme || FORMES[Math.floor(rng() * 2)], attente: [], surcharge: 0, bloque: 0 });
 }
 
 // État d'une nouvelle partie : cinq stations, deux lignes vides, deux rames.

@@ -20,6 +20,11 @@ function formeSVG(s, i) {
     else if (f === "carre") g += '<rect x="' + (px - 2.6).toFixed(0) + '" y="' + (py - 2.6).toFixed(0) + '" width="5.2" height="5.2" fill="#1d1c19"/>';
     else g += '<polygon points="' + px.toFixed(0) + "," + (py - 3.4).toFixed(0) + " " + (px + 3).toFixed(0) + "," + (py + 2.4).toFixed(0) + " " + (px - 3).toFixed(0) + "," + (py + 2.4).toFixed(0) + '" fill="#1d1c19"/>';
   });
+  /* emplacements bloqués : pastilles grises inertes sous la station */
+  for (var j = 0; j < s.bloque; j++) {
+    var bx = s.x - (s.bloque - 1) * 3.5 + j * 7, by = s.y + 33;
+    g += '<circle cx="' + bx.toFixed(1) + '" cy="' + by.toFixed(1) + '" r="2.5" fill="#8b8577"/>';
+  }
   if (s.surcharge > 0) {
     var c = 2 * Math.PI * RAYON_SURCHARGE;
     g += '<circle cx="' + s.x.toFixed(0) + '" cy="' + s.y.toFixed(0) + '" r="' + RAYON_SURCHARGE + '" fill="none" stroke="#e0483c" stroke-width="' + CONTOUR_SURCHARGE + '" '

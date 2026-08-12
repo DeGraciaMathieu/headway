@@ -4,11 +4,12 @@ import {
   TAUX_SURCHARGE_DECROISSANCE,
 } from "../config.js";
 
-// Prochain niveau de surcharge d'une station : croît quand la file atteint le
-// seuil, décroît sinon. Borné dans [0, 1].
-export function prochaineSurcharge(surcharge, attente) {
-  if (attente >= SEUIL_SURCHARGE)
-    return Math.min(1, surcharge + TAUX_SURCHARGE_CROISSANCE * (attente - (SEUIL_SURCHARGE - 1)));
+// Prochain niveau de surcharge d'une station selon son occupation (voyageurs en
+// attente + emplacements bloqués) : croît quand l'occupation atteint le seuil,
+// décroît sinon. Borné dans [0, 1].
+export function prochaineSurcharge(surcharge, occupation) {
+  if (occupation >= SEUIL_SURCHARGE)
+    return Math.min(1, surcharge + TAUX_SURCHARGE_CROISSANCE * (occupation - (SEUIL_SURCHARGE - 1)));
   return Math.max(0, surcharge - TAUX_SURCHARGE_DECROISSANCE);
 }
 

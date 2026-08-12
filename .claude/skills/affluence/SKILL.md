@@ -8,11 +8,14 @@ auto_invoke: true
 
 À chaque tick, un voyageur peut apparaître dans une station (plus souvent aux heures de
 pointe et au fil des semaines), avec une forme de destination. Un voyageur qui attend trop
-longtemps quitte la file (perdu). Une station qui accumule trop de monde monte en surcharge ;
-si sa surcharge atteint 1, le réseau s'arrête.
+longtemps quitte la file (perdu) et bloque définitivement un emplacement de la station. La
+surcharge se calcule sur l'**occupation** = voyageurs en attente + emplacements bloqués ; si
+elle atteint 1, le réseau s'arrête. Les emplacements bloqués ne fluctuent pas : ils
+rapprochent durablement la station de la surcharge.
 
 File d'une station : `s.attente[]`, chaque élément `{ f: forme visée, age: ticks d'attente }`.
-Surcharge : `s.surcharge` ∈ [0, 1]. Voyageurs perdus : `G.perdus`.
+Emplacements bloqués : `s.bloque` (≤ `MAX_BLOQUE`). Surcharge : `s.surcharge` ∈ [0, 1].
+Voyageurs perdus : `G.perdus`.
 
 ## Concepts → implémentation
 
@@ -21,9 +24,9 @@ Surcharge : `s.surcharge` ∈ [0, 1]. Voyageurs perdus : `G.perdus`.
 | Heure de pointe ? | `estHeurePointe(horloge)` | `src/rules/spawn.js` | `POINTE_MATIN_*`, `POINTE_SOIR_*` |
 | Probabilité d'apparition | `probaApparition(semaine, pointe)` | `src/rules/spawn.js` | `PROBA_APPARITION_BASE`, `PROBA_APPARITION_PAR_SEMAINE`, `FACTEUR_HEURE_POINTE` |
 | Forme du voyageur | `formeVoyageur(rng, semaine, formeStation)` | `src/rules/spawn.js` | `SEMAINE_TRIANGLE_MIN`, `INDEX_FORMES_MAX`, `PROBA_EVITE_MEME_FORME` |
-| Plafond de la file | `s.attente.length < CAPACITE_FILE` | `src/loop/tick.js` | `CAPACITE_FILE` |
-| Vieillissement / voyageurs perdus | `vieillirFile(attente)` → `{attente, perdus}` | `src/rules/patience.js` | `PATIENCE_MAX` |
-| Prochaine surcharge | `prochaineSurcharge(surcharge, attente)` | `src/rules/overload.js` | `SEUIL_SURCHARGE`, `TAUX_SURCHARGE_CROISSANCE`, `TAUX_SURCHARGE_DECROISSANCE` |
+| Plafond de la file | `s.attente.length + s.bloque < CAPACITE_FILE` | `src/loop/tick.js` | `CAPACITE_FILE` |
+| Vieillissement / perte / blocage | `vieillirFile(attente, bloque)` → `{attente, perdus, bloque}` | `src/rules/patience.js` | `PATIENCE_MAX`, `MAX_BLOQUE` |
+| Prochaine surcharge (sur l'occupation) | `prochaineSurcharge(surcharge, attente + bloque)` | `src/rules/overload.js` | `SEUIL_SURCHARGE`, `TAUX_SURCHARGE_CROISSANCE`, `TAUX_SURCHARGE_DECROISSANCE` |
 | Station saturée → fin | `estSaturee(surcharge)` → `G.fini` | `src/rules/overload.js` | — |
 | Orchestration par tick | bloc apparition + boucle surcharge | `src/loop/tick.js` | — |
 

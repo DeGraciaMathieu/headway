@@ -40,7 +40,8 @@ export const CAPACITE_FILE = 14;            // file d'attente d'une station
 export const CAPACITE_RAME = 6;             // voyageurs embarqués
 
 // Patience des voyageurs
-export const PATIENCE_MAX = 500;            // ticks avant qu'un voyageur qui attend s'en aille (perdu)
+export const PATIENCE_MAX = 220;            // ticks avant qu'un voyageur qui attend s'en aille (perdu)
+export const MAX_BLOQUE = 7;                // emplacements bloqués max par station (< SEUIL_SURCHARGE)
 
 // Rames
 export const VITESSE_RAME = 0.035;          // stations par tick
