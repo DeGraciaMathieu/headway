@@ -40,6 +40,12 @@ export function toucheStation(G, i) {
   l.stations = tracer(l.stations, i);
 }
 
+// Le joueur efface d'un coup tout le tracé de la ligne i.
+export function effacerLigne(G, i) {
+  if (G.fini) return;
+  G.lignes[i].stations = [];
+}
+
 // Le joueur encaisse sa dotation de fin de semaine : une rame ou une ligne.
 export function prendreDotation(G, type) {
   if (type === "rame") {

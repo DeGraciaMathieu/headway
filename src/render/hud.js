@@ -40,7 +40,8 @@ export function rend(G, actions, vue) {
     var nb = G.rames.filter(function (r) { return r.ligne === l.id; }).length;
     el.innerHTML = '<span class="pastille" style="background:' + COUL[l.id] + '"></span>'
       + '<span class="n">' + NOMS_L[l.id] + "</span>"
-      + '<span class="st">' + l.stations.length + " stations · " + nb + " rame" + (nb > 1 ? "s" : "") + "</span>";
+      + '<span class="st">' + l.stations.length + " stations · " + nb + " rame" + (nb > 1 ? "s" : "") + "</span>"
+      + (l.stations.length ? '<button class="eff" data-eff="' + l.id + '" title="Effacer la ligne">×</button>' : "");
     ll.appendChild(el);
   });
   if (G.lignes.length < MAX_LIGNES) {
@@ -51,6 +52,8 @@ export function rend(G, actions, vue) {
     ll.appendChild(el2);
   }
   ll.onclick = function (e) {
+    var eff = e.target.closest("[data-eff]");
+    if (eff) { actions.effacerLigne(+eff.dataset.eff); return; }
     var el = e.target.closest(".ligne");
     if (el && el.dataset.l !== undefined) actions.choisirLigne(+el.dataset.l);
   };

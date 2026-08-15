@@ -1,6 +1,6 @@
 import { TICK_MS } from "./config.js";
 import { createRng } from "./rules/rng.js";
-import { nouvellePartie, toucheStation, prendreDotation } from "./state/game.js";
+import { nouvellePartie, toucheStation, prendreDotation, effacerLigne } from "./state/game.js";
 import { tick } from "./loop/tick.js";
 import { rend } from "./render/hud.js";
 import { brancherBoutons } from "./input/controls.js";
@@ -16,6 +16,7 @@ function rendu() { rend(G, actions, vue); }
 const actions = {
   toucheStation(i) { toucheStation(G, i); rendu(); },
   choisirLigne(id) { G.selLigne = id; rendu(); },
+  effacerLigne(id) { effacerLigne(G, id); rendu(); },
   prendreDotation(type) { prendreDotation(G, type); rendu(); },
 };
 
