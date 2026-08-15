@@ -1,4 +1,4 @@
-import { HORLOGE_DEPART, STATIONS_INITIALES, RONDS_INITIAUX, FORMES } from "../config.js";
+import { HORLOGE_DEPART, STATIONS_INITIALES, RONDS_INITIAUX, FORMES, CAPACITE_RAME_BASE, GAIN_CAPACITE } from "../config.js";
 import { placerStation, formeNouvelleStation, stationBonus } from "../rules/week.js";
 import { tracer, peutAjouterLigne } from "../rules/network.js";
 
@@ -17,7 +17,7 @@ export function nouvellePartie(rng) {
     selLigne: 0, pause: false, fini: false, dotation: false, message: ""
   };
   for (let i = 0; i < STATIONS_INITIALES; i++) ajouterStation(G, rng, i < RONDS_INITIAUX ? "rond" : "carre");
-  G.lignes = [{ id: 0, stations: [] }, { id: 1, stations: [] }];
+  G.lignes = [{ id: 0, stations: [], capacite: CAPACITE_RAME_BASE }, { id: 1, stations: [], capacite: CAPACITE_RAME_BASE }];
   G.rames = [{ ligne: 0, pos: 0, dir: 1, charge: [] }, { ligne: 1, pos: 0, dir: 1, charge: [] }];
   G.message = "Touche une ligne, puis des stations, pour la tracer.";
   return G;
@@ -46,13 +46,16 @@ export function effacerLigne(G, i) {
   G.lignes[i].stations = [];
 }
 
-// Le joueur encaisse sa dotation de fin de semaine : une rame ou une ligne.
+// Le joueur encaisse sa dotation de fin de semaine : une rame, une ligne, ou
+// une amélioration de capacité sur la ligne sélectionnée.
 export function prendreDotation(G, type) {
   if (type === "rame") {
     G.stockRames++;
     G.rames.push({ ligne: G.selLigne, pos: 0, dir: 1, charge: [] });
+  } else if (type === "capacite") {
+    G.lignes[G.selLigne].capacite += GAIN_CAPACITE;
   } else {
-    if (peutAjouterLigne(G.lignes.length)) G.lignes.push({ id: G.lignes.length, stations: [] });
+    if (peutAjouterLigne(G.lignes.length)) G.lignes.push({ id: G.lignes.length, stations: [], capacite: CAPACITE_RAME_BASE });
     G.stockLignes++;
   }
   G.dotation = false; G.pause = false;

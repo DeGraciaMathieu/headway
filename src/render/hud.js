@@ -1,4 +1,4 @@
-import { NOMS_L, COUL, MAX_LIGNES, STATIONS_MIN_LIGNE } from "../config.js";
+import { NOMS_L, COUL, MAX_LIGNES, STATIONS_MIN_LIGNE, GAIN_CAPACITE } from "../config.js";
 import { carteSVG } from "./carte.js";
 
 var $ = function (s) { return document.querySelector(s); };
@@ -40,7 +40,7 @@ export function rend(G, actions, vue) {
     var nb = G.rames.filter(function (r) { return r.ligne === l.id; }).length;
     el.innerHTML = '<span class="pastille" style="background:' + COUL[l.id] + '"></span>'
       + '<span class="n">' + NOMS_L[l.id] + "</span>"
-      + '<span class="st">' + l.stations.length + " stations · " + nb + " rame" + (nb > 1 ? "s" : "") + "</span>"
+      + '<span class="st">' + l.stations.length + " stations · " + nb + " rame" + (nb > 1 ? "s" : "") + " · cap " + l.capacite + "</span>"
       + (l.stations.length ? '<button class="eff" data-eff="' + l.id + '" title="Effacer la ligne">×</button>' : "");
     ll.appendChild(el);
   });
@@ -61,7 +61,8 @@ export function rend(G, actions, vue) {
   var st = $("#stock");
   if (G.dotation) {
     st.innerHTML = '<span class="item on" data-d="rame"><b>+1</b> rame sur la ligne ' + NOMS_L[G.selLigne].toLowerCase() + "</span>"
-      + '<span class="item on" data-d="ligne"><b>+1</b> ligne' + (G.lignes.length >= MAX_LIGNES ? " (max atteint)" : "") + "</span>";
+      + '<span class="item on" data-d="ligne"><b>+1</b> ligne' + (G.lignes.length >= MAX_LIGNES ? " (max atteint)" : "") + "</span>"
+      + '<span class="item on" data-d="capacite"><b>+' + GAIN_CAPACITE + "</b> capacité sur la ligne " + NOMS_L[G.selLigne].toLowerCase() + "</span>";
   } else {
     st.innerHTML = '<span class="item vide">Prochaine dotation à minuit</span>';
   }

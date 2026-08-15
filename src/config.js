@@ -36,7 +36,8 @@ export const POINTE_SOIR_FIN = 19 * 60;
 
 // Capacités
 export const CAPACITE_FILE = 5;             // occupation max d'une station (attente + bloqués)
-export const CAPACITE_RAME = 6;             // voyageurs embarqués
+export const CAPACITE_RAME_BASE = 3;        // capacité de départ des rames d'une ligne
+export const GAIN_CAPACITE = 1;             // bonus de capacité par amélioration de dotation
 
 // Patience des voyageurs
 export const PATIENCE_MAX = 220;            // ticks avant qu'un voyageur qui attend s'en aille (perdu)

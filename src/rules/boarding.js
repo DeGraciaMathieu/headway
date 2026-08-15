@@ -1,10 +1,9 @@
-import { CAPACITE_RAME } from "../config.js";
-
 // Traite l'arrêt d'une rame en station selon le routage.
 // `distParForme` : forme -> tableau de distances par index de station
 // (voir rules/routing.js). `charge` : formes à bord. `attente` : file de la
 // station (`{ f, age }`). `ligneStations` : indices des arrêts de la ligne.
-// `iStation` : index global de la station de l'arrêt.
+// `iStation` : index global de la station de l'arrêt. `capacite` : nombre de
+// voyageurs que peut embarquer une rame de cette ligne.
 //
 // Descentes d'abord, puis montées :
 // - un voyageur à bord dont la station est de sa forme (distance 0) est arrivé ;
@@ -14,7 +13,7 @@ import { CAPACITE_RAME } from "../config.js";
 // - un voyageur en attente monte si cette ligne le rapproche de sa forme.
 //
 // Rend la nouvelle charge, la nouvelle file et le nombre d'arrivées.
-export function traiterArret(charge, attente, ligneStations, iStation, distParForme) {
+export function traiterArret(charge, attente, ligneStations, iStation, distParForme, capacite) {
   const minSurLigne = (f) => Math.min.apply(null, ligneStations.map((i) => distParForme[f][i]));
 
   let transportes = 0;
@@ -32,7 +31,7 @@ export function traiterArret(charge, attente, ligneStations, iStation, distParFo
   file.forEach((t) => {
     const d = distParForme[t.f][iStation];
     const rapproche = d > 0 && minSurLigne(t.f) < d;
-    if (rapproche && nouvelleCharge.length < CAPACITE_RAME) nouvelleCharge.push(t.f);
+    if (rapproche && nouvelleCharge.length < capacite) nouvelleCharge.push(t.f);
     else reste.push(t);
   });
 

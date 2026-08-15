@@ -38,7 +38,7 @@ export function tick(G, rng) {
       const st = G.stations[iStation];
       if (st && r._last !== iStation + "@" + G.t) {
         r._last = iStation + "@" + G.t;
-        const res = traiterArret(r.charge, st.attente, l.stations, iStation, distParForme);
+        const res = traiterArret(r.charge, st.attente, l.stations, iStation, distParForme, l.capacite);
         r.charge = res.charge; st.attente = res.attente; G.voyageurs += res.transportes;
       }
     }
