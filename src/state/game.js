@@ -55,7 +55,11 @@ export function prendreDotation(G, type) {
   } else if (type === "capacite") {
     G.lignes[G.selLigne].capacite += GAIN_CAPACITE;
   } else {
-    if (peutAjouterLigne(G.lignes.length)) G.lignes.push({ id: G.lignes.length, stations: [], capacite: CAPACITE_RAME_BASE });
+    if (peutAjouterLigne(G.lignes.length)) {
+      const id = G.lignes.length;
+      G.lignes.push({ id, stations: [], capacite: CAPACITE_RAME_BASE });
+      G.rames.push({ ligne: id, pos: 0, dir: 1, charge: [] });
+    }
     G.stockLignes++;
   }
   G.dotation = false; G.pause = false;
