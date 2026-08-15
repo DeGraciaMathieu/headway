@@ -107,6 +107,21 @@ Note : la seule différence de sortie assumée est que l'aléa provient désorma
 graine (exigé par la dé-randomisation). Le ressenti est identique ; seule la séquence exacte
 diffère d'un `Math.random` non graine.
 
+## Post-refactor gameplay changes
+
+Écarts d'équilibrage **assumés** décidés après le refactor (hors « comportement constant »).
+
+- **Capacité par ligne + dotation d'amélioration.** La capacité des rames, autrefois la
+  constante globale `CAPACITE_RAME = 6`, est devenue un champ d'état `capacite` porté par
+  chaque ligne (`state/game.js`), reçu en argument par `boarding.traiterArret` (la règle
+  reste pure). Une 3ᵉ dotation de fin de semaine (`type "capacite"`) améliore la ligne
+  sélectionnée. Config : `CAPACITE_RAME_BASE`, `GAIN_CAPACITE`.
+- **Base abaissée 6 → 3, gain +1.** La base d'origine (6) dépassait le plafond de file
+  (`CAPACITE_FILE = 5`) : une rame vidait un quai entier d'un coup, la capacité n'était
+  jamais le facteur limitant et l'amélioration de dotation restait sans effet ressenti.
+  Base ramenée à `3` (sous le plafond) et gain à `1` pour que la file/surcharge morde tôt
+  et que la progression `3 → 4 → 5 …` se sente. Valeurs à confirmer au playtest.
+
 ## Open questions
 
 Decisions the code does not settle and that were not made. Never resolved by guessing.
