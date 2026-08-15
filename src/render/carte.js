@@ -57,7 +57,7 @@ export function carteSVG(G) {
     s += '<rect x="' + (x - 9).toFixed(0) + '" y="' + (y - 6).toFixed(0) + '" width="18" height="12" fill="#1d1c19" '
       + 'transform="rotate(' + ang.toFixed(0) + " " + x.toFixed(0) + " " + y.toFixed(0) + ')"/>';
     if (r.charge.length)
-      s += '<text x="' + x.toFixed(0) + '" y="' + (y - 11).toFixed(0) + '" font-family="Space Grotesk" font-size="10" fill="#1d1c19" text-anchor="middle">' + r.charge.length + "</text>";
+      s += '<text x="' + x.toFixed(0) + '" y="' + (y + 16).toFixed(0) + '" font-family="Space Grotesk" font-size="10" fill="#1d1c19" text-anchor="middle">' + r.charge.length + "</text>";
   });
 
   G.stations.forEach(function (st, i) { s += formeSVG(st, i); });
