@@ -121,6 +121,14 @@ diffère d'un `Math.random` non graine.
   jamais le facteur limitant et l'amélioration de dotation restait sans effet ressenti.
   Base ramenée à `3` (sous le plafond) et gain à `1` pour que la file/surcharge morde tôt
   et que la progression `3 → 4 → 5 …` se sente. Valeurs à confirmer au playtest.
+- **Correction : cible du voyageur bornée aux formes présentes.** Le prototype (comportement
+  conservé au refactor) ouvrait la cible triangle sur un simple critère de semaine
+  (`semaine >= SEMAINE_TRIANGLE_MIN`) dans `spawn.formeVoyageur`, alors que les stations
+  triangles n'ouvrent que de façon probabiliste (`PROBA_TRIANGLE`). Résultat : des voyageurs
+  triangles apparaissaient sans station triangle existante, donc indélivrables. `formeVoyageur`
+  choisit désormais parmi les **formes réellement présentes** dans le réseau (hors forme de la
+  station de départ) ; le tick lui passe l'ensemble des formes des stations. Le gating par
+  semaine reste, à sa vraie place, dans `week.formeNouvelleStation` (ouverture des stations).
 
 ## Open questions
 
