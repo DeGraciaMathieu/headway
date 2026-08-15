@@ -13,7 +13,6 @@ export const NIVEAUX_VITESSE = [1, 2, 3];   // multiplicateurs de vitesse du tem
 export const COUL = ["#e0483c", "#2f6fd0", "#f0b429", "#3f9e6a"];
 export const NOMS_L = ["Rouge", "Bleue", "Jaune", "Verte"];
 export const FORMES = ["rond", "carre", "triangle"];
-export const INDEX_FORMES_MAX = 2;          // dernier index de FORMES (le triangle)
 export const STATIONS_MIN_LIGNE = 2;        // arrêts minimum pour qu'une ligne soit active
 
 // Mise en place initiale

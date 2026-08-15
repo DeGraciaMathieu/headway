@@ -20,8 +20,9 @@ export function tick(G, rng) {
   const pointe = estHeurePointe(G.horloge);
   if (rng() < probaApparition(G.semaine, pointe) && G.stations.length) {
     const s = G.stations[Math.floor(rng() * G.stations.length)];
-    const cible = formeVoyageur(rng, G.semaine, s.forme);
-    if (s.attente.length + s.bloque < CAPACITE_FILE) s.attente.push({ f: cible, age: 0 });
+    const formesPresentes = [...new Set(G.stations.map((x) => x.forme))];
+    const cible = formeVoyageur(rng, s.forme, formesPresentes);
+    if (cible && s.attente.length + s.bloque < CAPACITE_FILE) s.attente.push({ f: cible, age: 0 });
   }
 
   /* rames : distances de routage vers chaque forme, réseau fixe sur ce tick */

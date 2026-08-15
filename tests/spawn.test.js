@@ -14,23 +14,32 @@ test("l'apparition est plus probable en heure de pointe", () => {
   assert.equal(probaApparition(1, true), probaApparition(1, false) * FACTEUR_HEURE_POINTE);
 });
 
-test("le triangle n'apparaît pas avant la semaine 3", () => {
+test("un voyageur ne cible jamais une forme absente du réseau", () => {
+  // Tant qu'aucune station triangle n'est ouverte, aucun voyageur triangle.
   const rng = createRng(1);
-  for (let n = 0; n < 200; n++) assert.notEqual(formeVoyageur(rng, 2, "rond"), "triangle");
+  const presentes = ["rond", "carre"];
+  for (let n = 0; n < 200; n++) assert.notEqual(formeVoyageur(rng, "rond", presentes), "triangle");
 });
 
-test("le triangle peut apparaître à partir de la semaine 3", () => {
+test("un voyageur peut cibler le triangle dès qu'une station triangle existe", () => {
   const rng = createRng(1);
+  const presentes = ["rond", "carre", "triangle"];
   let vuTriangle = false;
   for (let n = 0; n < 500 && !vuTriangle; n++) {
-    if (formeVoyageur(rng, 3, "rond") === "triangle") vuTriangle = true;
+    if (formeVoyageur(rng, "rond", presentes) === "triangle") vuTriangle = true;
   }
   assert.equal(vuTriangle, true);
 });
 
 test("un voyageur ne cible jamais la forme de sa station de départ", () => {
   const rng = createRng(2);
+  const presentes = ["rond", "carre", "triangle"];
   for (let n = 0; n < 500; n++) {
-    assert.notEqual(formeVoyageur(rng, 3, "carre"), "carre");
+    assert.notEqual(formeVoyageur(rng, "carre", presentes), "carre");
   }
+});
+
+test("aucune cible si la seule forme du réseau est celle de la station", () => {
+  const rng = createRng(3);
+  assert.equal(formeVoyageur(rng, "rond", ["rond"]), null);
 });
