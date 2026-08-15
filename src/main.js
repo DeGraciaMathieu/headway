@@ -16,6 +16,7 @@ function rendu() { rend(G, actions, vue); }
 const actions = {
   toucheStation(i) { toucheStation(G, i); rendu(); },
   choisirLigne(id) { G.selLigne = id; rendu(); },
+  choisirVitesse(v) { G.vitesse = v; rendu(); },
   effacerLigne(id) { effacerLigne(G, id); rendu(); },
   prendreDotation(type) { prendreDotation(G, type); rendu(); },
 };
@@ -29,11 +30,17 @@ brancherBoutons({
 
 rendu();
 setInterval(() => {
-  if (!tick(G, rng)) return;
-  if (G.fini) {
-    vue.nouveauRecord = G.voyageurs > meilleur;
-    if (vue.nouveauRecord) { meilleur = G.voyageurs; localStorage.setItem(CLE_MEILLEUR, String(meilleur)); }
-    vue.meilleur = meilleur;
+  // Accélérer le temps = jouer plusieurs pas de simulation par intervalle réel.
+  let avance = false;
+  for (let n = 0; n < G.vitesse; n++) {
+    if (!tick(G, rng)) break;
+    avance = true;
+    if (G.fini) {
+      vue.nouveauRecord = G.voyageurs > meilleur;
+      if (vue.nouveauRecord) { meilleur = G.voyageurs; localStorage.setItem(CLE_MEILLEUR, String(meilleur)); }
+      vue.meilleur = meilleur;
+      break;
+    }
   }
-  rendu();
+  if (avance) rendu();
 }, TICK_MS);

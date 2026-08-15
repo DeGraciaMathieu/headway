@@ -62,6 +62,10 @@ svg{display:block;width:100%;height:auto;touch-action:manipulation}
   font-family:var(--sans);font-weight:700;font-size:13.5px;letter-spacing:.06em;
   text-transform:uppercase;padding:14px;cursor:pointer}
 .foot .sec{background:transparent;border:1px solid var(--trait);color:var(--terne);margin-top:8px}
+.vitesses{display:flex;gap:6px;margin-bottom:8px}
+.vitesses button{flex:1;border:1px solid var(--trait);background:#fff;color:var(--terne);
+  font-family:var(--sans);font-weight:700;font-size:12.5px;padding:9px;cursor:pointer}
+.vitesses button.on{background:var(--encre);color:var(--papier);border-color:var(--encre)}
 .note{text-align:center;font-size:11px;color:var(--terne);margin-top:10px;line-height:1.5}
 
 .modal{position:absolute;inset:0;background:rgba(244,240,230,.97);z-index:50;display:none;
@@ -98,6 +102,7 @@ svg{display:block;width:100%;height:auto;touch-action:manipulation}
   <div class="stock" id="stock"></div>
 
   <div class="foot">
+    <div class="vitesses" id="vitesses"></div>
     <button id="pause">Pause</button>
     <button class="sec" id="rejouer">Nouvelle partie</button>
     <p class="note" id="note"></p>

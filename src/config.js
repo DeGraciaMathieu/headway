@@ -7,6 +7,7 @@ export const TICK_MS = 90;                  // durée d'un tick
 export const MINUTES_PAR_TICK = 2;          // avance de l'horloge par tick
 export const MINUTES_PAR_JOUR = 24 * 60;    // longueur d'une journée simulée
 export const HORLOGE_DEPART = 6 * 60;       // 06:00
+export const NIVEAUX_VITESSE = [1, 2, 3];   // multiplicateurs de vitesse du temps (ticks par intervalle)
 
 // Couleurs et libellés des lignes, formes des voyageurs
 export const COUL = ["#e0483c", "#2f6fd0", "#f0b429", "#3f9e6a"];

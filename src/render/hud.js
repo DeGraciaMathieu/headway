@@ -1,4 +1,4 @@
-import { NOMS_L, COUL, MAX_LIGNES, STATIONS_MIN_LIGNE, GAIN_CAPACITE } from "../config.js";
+import { NOMS_L, COUL, MAX_LIGNES, STATIONS_MIN_LIGNE, GAIN_CAPACITE, NIVEAUX_VITESSE } from "../config.js";
 import { carteSVG } from "./carte.js";
 
 var $ = function (s) { return document.querySelector(s); };
@@ -69,6 +69,15 @@ export function rend(G, actions, vue) {
   st.onclick = function (e) {
     var el = e.target.closest("[data-d]");
     if (el) actions.prendreDotation(el.dataset.d);
+  };
+
+  var vt = $("#vitesses");
+  vt.innerHTML = NIVEAUX_VITESSE.map(function (v) {
+    return '<button data-v="' + v + '"' + (G.vitesse === v ? ' class="on"' : "") + ">×" + v + "</button>";
+  }).join("");
+  vt.onclick = function (e) {
+    var b = e.target.closest("[data-v]");
+    if (b) actions.choisirVitesse(+b.dataset.v);
   };
 
   $("#pause").textContent = G.fini ? "Réseau arrêté" : (G.pause ? "Reprendre" : "Pause");

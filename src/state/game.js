@@ -14,7 +14,7 @@ export function nouvellePartie(rng) {
   const G = {
     t: 0, semaine: 1, horloge: HORLOGE_DEPART, voyageurs: 0, perdus: 0,
     stations: [], lignes: [], rames: [], stockRames: 1, stockLignes: 0,
-    selLigne: 0, pause: false, fini: false, dotation: false, message: ""
+    selLigne: 0, vitesse: 1, pause: false, fini: false, dotation: false, message: ""
   };
   for (let i = 0; i < STATIONS_INITIALES; i++) ajouterStation(G, rng, i < RONDS_INITIAUX ? "rond" : "carre");
   G.lignes = [{ id: 0, stations: [], capacite: CAPACITE_RAME_BASE }, { id: 1, stations: [], capacite: CAPACITE_RAME_BASE }];
